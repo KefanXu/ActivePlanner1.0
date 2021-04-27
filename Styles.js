@@ -12,6 +12,8 @@ export const loginStyles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "white",
   },
+
+  
   inputField: {
     flex: 0.4,
     width: "80%",

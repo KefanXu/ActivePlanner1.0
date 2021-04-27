@@ -257,7 +257,8 @@ export class CalendarPlanScreen extends React.Component {
       nextBtnState: "next",
       submitBtnState: true,
       reason: "",
-      feeling: "",
+      feeling: "Neutral",
+
       otherActivity: "",
 
       monthCalCurrDate: new Date(),
@@ -580,8 +581,8 @@ export class CalendarPlanScreen extends React.Component {
     }
     let year = new Date().getFullYear();
 
-    let startMinutes = moment(this.state.date).format("HH:mm:ss");
-    let endMinutes = moment(this.state.date)
+    let startMinutes = moment(this.state.timePickerDate).format("HH:mm:ss");
+    let endMinutes = moment(this.state.timePickerDate)
       .add(30, "minutes")
       .format("HH:mm:ss");
     let date = year + "-" + monthNum + "-" + dateNum + "T";
@@ -784,6 +785,12 @@ export class CalendarPlanScreen extends React.Component {
           }}
         />
       );
+    } else {
+      planTodayView = (
+        <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+          No Activity Planned for today
+        </Text>
+      );
     }
 
     return (
@@ -843,7 +850,17 @@ export class CalendarPlanScreen extends React.Component {
               >
                 <View>
                   <TouchableOpacity
-                    onPress={() => this.setState({ isReportModalVis: false })}
+                    onPress={() => {
+                      this.setState({ isReportModalVis: false });
+                      this.setState({ feeling: "Neutral" });
+                      this.setState({ isActivityCompleted: false });
+                      this.setState({ isThirtyMin: false });
+                      this.setState({ isFirstStepVis: "flex" });
+                      this.setState({ isSecondYesStepVis: "none" });
+                      this.setState({ isThirdYesStepVis: "none" });
+                      this.setState({ isSecondNoStepVis: "none" });
+                      this.setState({ isThirdNoStepVis: "none" });
+                    }}
                   >
                     <MaterialIcons name="cancel" size={24} color="black" />
                   </TouchableOpacity>
@@ -1117,6 +1134,12 @@ export class CalendarPlanScreen extends React.Component {
                     if (this.state.nextBtnState === "submit") {
                       this.setState({ isReportModalVis: false });
                       this.setState({ nextBtnState: "next" });
+
+                      this.setState({ isThirdNoStepVis: "none" });
+                      this.setState({ isThirdYesStepVis: "none" });
+
+                      this.setState({ isFirstStepVis: "flex" });
+
                       let eventToUpdate = this.eventToday;
                       eventToUpdate.isActivityCompleted = this.state.isActivityCompleted;
                       eventToUpdate.isReported = true;
@@ -1134,15 +1157,34 @@ export class CalendarPlanScreen extends React.Component {
 
                       await this.setState({ eventsThisMonth: eventList });
                       await this.dataModel.loadUserPlans(this.userKey);
+                      this.setState({ feeling: "Neutral" });
+                      this.setState({ isActivityCompleted: false });
+                      this.setState({ isThirtyMin: false });
                       this.userPlans = this.dataModel.getUserPlans();
                       //this.updateView();
 
-                      let updateList = this.state.pastPlans;
-                      let index = updateList.indexOf(this.eventToday);
-                      if (index > -1) {
-                        updateList.splice(index, 1);
+                      let todayDate = new Date();
+                      let eventDate = new Date(this.eventToday.start);
+                      let updateList = [];
+                      if (
+                        todayDate.getDate() === eventDate.getDate() &&
+                        todayDate.getMonth() === eventDate.getMonth()
+                      ) {
+                        updateList = this.state.todayPlan;
+                        console.log("updateList", updateList);
+                        let index = updateList.indexOf(this.eventToday);
+                        if (index > -1) {
+                          updateList.splice(index, 1);
+                        }
+                        this.setState({ todayPlan: updateList });
+                      } else {
+                        updateList = this.state.pastPlans;
+                        let index = updateList.indexOf(this.eventToday);
+                        if (index > -1) {
+                          updateList.splice(index, 1);
+                        }
+                        this.setState({ pastPlans: updateList });
                       }
-                      this.setState({ pastPlans: updateList });
                     } else if (this.state.nextBtnState === "next") {
                       this.setState({ isBackBtnVis: false });
                       this.setState({ isFirstStepVis: "none" });
@@ -1192,7 +1234,7 @@ export class CalendarPlanScreen extends React.Component {
               width: "100%",
               height: "100%",
               justifyContent: "space-between",
-              alignItems:"center"
+              alignItems: "center",
             }}
           >
             <View
