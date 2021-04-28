@@ -34,44 +34,14 @@ import SwitchSelector from "react-native-switch-selector";
 import ModalSelector from "react-native-modal-selector";
 import { FlatList } from "react-native-gesture-handler";
 
-// import AnimatedMultistep from "react-native-animated-multistep";
-// const reportOptions = [
-//   {
-//     title: "Options",
-//     data: [
-//       { key: 1, text: "a", color: "red" },
-//       { key: 2, text: "b", color: "blue" },
-//       { key: 3, text: "c", color: "red" },
-//       { key: 4, text: "d", color: "blue" },
-//     ],
-//   },
-// ];
-
-// import Step1 from "./steps/step1";
-// import Step2 from "./steps/step2";
-// import Step3 from "./steps/step3";
-// import Step4 from "./steps/step4";
-
-// const allSteps = [
-//   { name: "step 1", component: Step1 },
-//   { name: "step 2", component: Step2 },
-//   { name: "step 3", component: Step3 },
-//   { name: "step 4", component: Step4 },
-// ];
-
 let index = 0;
 const data = [
   { key: index++, section: true, label: "Physical Activities" },
   { key: index++, label: "Walking" },
   { key: index++, label: "Jogging" },
-  // {
-  //   key: index++,
-  //   label: "Cranberries",
-  //   accessibilityLabel: "Tap here for cranberries",
-  // },
-  // // etc...
-  // // Can also add additional custom keys which are passed to the onChange callback
-  // { key: index++, label: "Vegetable", customKey: "Not a fruit" },
+  { key: index++, label: "Dancing" },
+  { key: index++, label: "Gardening" },
+
 ];
 
 const WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -860,6 +830,11 @@ export class CalendarPlanScreen extends React.Component {
                       this.setState({ isThirdYesStepVis: "none" });
                       this.setState({ isSecondNoStepVis: "none" });
                       this.setState({ isThirdNoStepVis: "none" });
+
+
+                      this.setState({ nextBtnState: "next" });
+
+
                     }}
                   >
                     <MaterialIcons name="cancel" size={24} color="black" />
@@ -1038,6 +1013,7 @@ export class CalendarPlanScreen extends React.Component {
                         marginRight: 20,
                         fontSize: 20,
                       }}
+                      maxLength = {35}
                       autoCapitalize="none"
                       autoCorrect={false}
                       value={this.state.reason}
@@ -1132,13 +1108,20 @@ export class CalendarPlanScreen extends React.Component {
                   title={this.state.btnName}
                   onPress={async () => {
                     if (this.state.nextBtnState === "submit") {
+
+
+
                       this.setState({ isReportModalVis: false });
                       this.setState({ nextBtnState: "next" });
 
+                      this.setState({ feeling: "Neutral" });
+                      this.setState({ isActivityCompleted: false });
+                      this.setState({ isThirtyMin: false });
+                      this.setState({ isFirstStepVis: "flex" });
+                      this.setState({ isSecondYesStepVis: "none" });
+                      this.setState({ isSecondNoStepVis: "none" });
                       this.setState({ isThirdNoStepVis: "none" });
                       this.setState({ isThirdYesStepVis: "none" });
-
-                      this.setState({ isFirstStepVis: "flex" });
 
                       let eventToUpdate = this.eventToday;
                       eventToUpdate.isActivityCompleted = this.state.isActivityCompleted;

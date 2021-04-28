@@ -36,6 +36,7 @@ class DataModel {
     this.plans = [];
     this.key = "";
     this.asyncInit();
+    // init function -> create new datamodel / reset data to initial state
     console.log("Data Model created");
   }
 
