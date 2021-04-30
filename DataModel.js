@@ -9,6 +9,7 @@ import * as Google from "expo-google-app-auth";
 const config = {
   // clientId:
   //   "858218224278-2rdlmrgknnj1m8m7hourt0r59iuiiagm.apps.googleusercontent.com",
+  iosStandaloneAppClientId:"858218224278-5k545fdqrtnhevp0lefpl7ht1ebf3gap.apps.googleusercontent.com",
   iosClientId:
     "858218224278-nsuhfmntn6alt59c74sl312i5od457dm.apps.googleusercontent.com",
   scopes: [

@@ -354,6 +354,19 @@ export class LoginScreen extends React.Component {
           >
             <Text style={loginStyles.buttonFont}>Sign In with Google</Text>
           </TouchableOpacity>
+
+          {/* <TouchableOpacity
+            style={loginStyles.buttonStyle}
+            onPress={async () => {
+              Alert.alert(
+                "Please select an activity",
+                "Activity Type Missing",
+                [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+              );
+            }}
+          >
+            <Text style={loginStyles.buttonFont}>test</Text>
+          </TouchableOpacity> */}
           {/* <TouchableOpacity
             style={loginStyles.buttonStyle}
             onPress={() => this.fetchWeatherInfo()}
