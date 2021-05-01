@@ -34,15 +34,14 @@ import SwitchSelector from "react-native-switch-selector";
 import ModalSelector from "react-native-modal-selector";
 import { FlatList } from "react-native-gesture-handler";
 
-let index = 0;
-const data = [
-  { key: index++, section: true, label: "Physical Activities" },
-  { key: index++, label: "Walking" },
-  { key: index++, label: "Jogging" },
-  { key: index++, label: "Dancing" },
-  { key: index++, label: "Gardening" },
-
-];
+// let index = 0;
+// const data = [
+//   { key: index++, section: true, label: "Physical Activities" },
+//   { key: index++, label: "Walking" },
+//   { key: index++, label: "Jogging" },
+//   { key: index++, label: "Dancing" },
+//   { key: index++, label: "Gardening" },
+// ];
 
 const WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -63,6 +62,22 @@ export class CalendarPlanScreen extends React.Component {
       "November",
       "December",
     ];
+
+    this.activityData = [
+      { key: 1, section: true, label: "Physical Activities" },
+    ];
+    let activityList = this.props.route.params.userActivityList;
+    console.log("activityList",activityList);
+    this.index = 1;
+    for (let activity of activityList) {
+      this.index++;
+      let activityObj = {
+        key: this.index,
+        label: activity,
+      }
+      this.activityData.push(activityObj);
+    }
+    
     this.monthCalRef = React.createRef();
     this.weekCalRef = React.createRef();
     this.dataModel = getDataModel();
@@ -259,6 +274,9 @@ export class CalendarPlanScreen extends React.Component {
       pastPlans: this.pastPlans,
       futurePlans: this.futurePlans,
       todayPlan: this.planToday,
+
+      activityData: this.activityData,
+      userDefinedActivityText:"",
     };
     //console.log("weatherThisMonth",this.state.weatherThisMonth);
     // this.monthCalRef = React.createRef();
@@ -831,10 +849,7 @@ export class CalendarPlanScreen extends React.Component {
                       this.setState({ isSecondNoStepVis: "none" });
                       this.setState({ isThirdNoStepVis: "none" });
 
-
                       this.setState({ nextBtnState: "next" });
-
-
                     }}
                   >
                     <MaterialIcons name="cancel" size={24} color="black" />
@@ -1013,7 +1028,7 @@ export class CalendarPlanScreen extends React.Component {
                         marginRight: 20,
                         fontSize: 20,
                       }}
-                      maxLength = {35}
+                      maxLength={35}
                       autoCapitalize="none"
                       autoCorrect={false}
                       value={this.state.reason}
@@ -1108,9 +1123,6 @@ export class CalendarPlanScreen extends React.Component {
                   title={this.state.btnName}
                   onPress={async () => {
                     if (this.state.nextBtnState === "submit") {
-
-
-
                       this.setState({ isReportModalVis: false });
                       this.setState({ nextBtnState: "next" });
 
@@ -1634,9 +1646,9 @@ export class CalendarPlanScreen extends React.Component {
                     }}
                     optionTextStyle={{ fontWeight: "bold" }}
                     sectionTextStyle={{ fontWeight: "bold" }}
-                    cancelStyle={{ backgroundColor: "white", borderRadius: 15 }}
-                    cancelTextStyle={{ fontWeight: "bold" }}
-                    data={data}
+                    cancelStyle={{ backgroundColor: "grey", borderRadius: 15 }}
+                    cancelTextStyle={{ fontWeight: "bold", color:"white" }}
+                    data={this.state.activityData}
                     initValue={this.state.activityPickerInitVal}
                     onChange={async (item) => {
                       this.selectedActivity = item.label;
@@ -1791,15 +1803,54 @@ export class CalendarPlanScreen extends React.Component {
                 flex: 0.4,
                 flexDirection: "row",
                 width: "90%",
+                //backgroundColor:"red",
                 borderRadius: 20,
-                justifyContent: "flex-end",
+                justifyContent: "space-between",
                 marginTop: 20,
               }}
             >
+              <View
+                style={{
+                  flex: 0.7,
+                  backgroundColor: "white",
+                  height: 50,
+                  borderRadius: 15,
+                  borderWidth: 2,
+                  borderColor: "black",
+                  marginRight: 10,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <TextInput
+                  style={{ fontSize: 16, marginLeft: 5 }}
+                  placeholder="add self-defined activity"
+                  value={this.state.userDefinedActivityText}
+                  onChangeText={(text) => this.setState({userDefinedActivityText:text})}
+                ></TextInput>
+                <View style={{}}>
+                  <TouchableOpacity
+                    onPress={async() => {
+                      let activityList = this.state.activityData;
+                      // console.log("activityList",activityList);
+                      this.index++;
+                      let newActivity = { key: this.index, label: this.state.userDefinedActivityText};
+                      // console.log("newActivity",newActivity);
+                      activityList.push(newActivity);
+                      this.setState({userDefinedActivityText:activityList});
+                      await this.dataModel.updateUserActivities(this.userKey,this.state.userDefinedActivityText);
+                    }}
+                  >
+                    <Ionicons name="ios-add-circle" size={30} color={"black"} />
+                  </TouchableOpacity>
+                </View>
+              </View>
               <TouchableOpacity
                 disabled={false}
                 onPress={() => this.onPlanBtnPressed()}
                 style={{
+                  flex: 0.3,
                   backgroundColor: "black",
                   color: "white",
                   width: 100,

@@ -192,7 +192,7 @@ export class LoginScreen extends React.Component {
     console.log("calendarsID", calendarsID);
     for (let user of userList) {
       if (calendarsID === user.email) {
-        console.log("user.email", user.email);
+        //console.log("user.email", user.email);
         isUserFound = true;
         key = user.key;
       }
@@ -204,7 +204,12 @@ export class LoginScreen extends React.Component {
     // console.log(previousMonthList);
     // console.log(thisMonthList);
     // console.log(nextMonthList);
-
+    let userDefineActivitiesNotExist = await this.dataModel.isUserDefineActivitiesExist(key)
+    if (userDefineActivitiesNotExist) {
+      await this.dataModel.createUserActivities(key);
+    }
+    let userActivityList = await this.dataModel.getUserActivities(key);
+    //console.log("userActivityList",userActivityList);
     // console.log("user key:",key);
     await this.dataModel.loadUserPlans(key);
     let userPlans = this.dataModel.getUserPlans();
@@ -225,6 +230,8 @@ export class LoginScreen extends React.Component {
     // console.log("thisMonthWeather", thisMonthWeather);
 
     // console.log("nextMonthWeather", nextMonthWeather);
+    //console.log("userActivityList",userActivityList);
+    //console.log("userActivityList.activityList",userActivityList.activityList);
     this.props.navigation.navigate("Home Screen", {
       userEmail: calendarsID,
       userInfo: userInfo,
@@ -232,6 +239,7 @@ export class LoginScreen extends React.Component {
       eventsThisMonth: thisMonthList,
       eventsNextMonth: nextMonthList,
       fullEventList: fullEventList,
+      userActivityList: userActivityList[0].activityList,
       // lastMonthWeather: lastMonthWeather,
       // thisMonthWeather: thisMonthWeather,
       // nextMonthWeather: nextMonthWeather,
