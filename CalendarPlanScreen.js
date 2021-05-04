@@ -67,17 +67,17 @@ export class CalendarPlanScreen extends React.Component {
       { key: 1, section: true, label: "Physical Activities" },
     ];
     let activityList = this.props.route.params.userActivityList;
-    console.log("activityList",activityList);
+    console.log("activityList", activityList);
     this.index = 1;
     for (let activity of activityList) {
       this.index++;
       let activityObj = {
         key: this.index,
         label: activity,
-      }
+      };
       this.activityData.push(activityObj);
     }
-    
+
     this.monthCalRef = React.createRef();
     this.weekCalRef = React.createRef();
     this.dataModel = getDataModel();
@@ -203,7 +203,7 @@ export class CalendarPlanScreen extends React.Component {
         //let plannedEvent = Object.assign({}, event);
       }
     }
-
+    this.isNoEventDayReportModalVis = false;
     this.reportPopUp(this.userPlans);
     this.state = {
       isMonthCalVis: true,
@@ -276,7 +276,9 @@ export class CalendarPlanScreen extends React.Component {
       todayPlan: this.planToday,
 
       activityData: this.activityData,
-      userDefinedActivityText:"",
+      userDefinedActivityText: "",
+
+      isNoEventDayReportModalVis: this.isNoEventDayReportModalVis,
     };
     //console.log("weatherThisMonth",this.state.weatherThisMonth);
     // this.monthCalRef = React.createRef();
@@ -314,17 +316,27 @@ export class CalendarPlanScreen extends React.Component {
   reportPopUp = (userPlanList) => {
     let currentDate = moment(new Date()).format().slice(0, 10);
     //console.log("userPlanList", userPlanList);
+    let isNoEventToday = true;
     for (let event of userPlanList) {
       if (event.end && !event.isDeleted) {
         let eventDate = event.end.slice(0, 10);
+        console.log("eventDate", eventDate);
+        if (eventDate === currentDate) {
+          console.log("isNoEventToday", isNoEventToday);
+          isNoEventToday = false;
+        }
+        //let eventDate = event.end.slice(0, 10);
         //console.log(eventDate);
         if (currentDate === eventDate) {
-          if (!event.isReported) {
+          if (event.isReported === false && event.title) {
             this.isReportModalVis = true;
             this.eventToday = event;
           }
         }
       }
+    }
+    if (isNoEventToday) {
+      this.isNoEventDayReportModalVis = true;
     }
     //console.log("this.isReportModalVis", this.isReportModalVis);
   };
@@ -791,6 +803,392 @@ export class CalendarPlanScreen extends React.Component {
           justifyContent: "flex-end",
         }}
       >
+        {/* noEventDayReport */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={this.state.isNoEventDayReportModalVis}
+          onRequestClose={() => {
+            Alert.alert("Modal has been closed");
+          }}
+        >
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              //backgroundColor:"red"
+            }}
+          >
+            <View
+              style={{
+                flex: 0.6,
+                width: "95%",
+                backgroundColor: "white",
+                borderWidth: 2,
+                borderColor: "black",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderRadius: 15,
+              }}
+            >
+              <View
+                style={{
+                  flex: 0.05,
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "flex-end",
+                }}
+              >
+                <View>
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.setState({ isNoEventDayReportModalVis: false });
+                      this.setState({ feeling: "Neutral" });
+                      this.setState({ isActivityCompleted: false });
+                      this.setState({ isThirtyMin: false });
+                      this.setState({ isFirstStepVis: "flex" });
+                      this.setState({ isSecondYesStepVis: "none" });
+                      this.setState({ isThirdYesStepVis: "none" });
+                      this.setState({ isSecondNoStepVis: "none" });
+                      this.setState({ isThirdNoStepVis: "none" });
+                      this.setState({ nextBtnState: "next" });
+                      this.setState({ otherActivity: "" });
+                    }}
+                  >
+                    <MaterialIcons name="cancel" size={24} color="black" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View
+                style={{
+                  flex: 0.2,
+                  width: "80%",
+                  marginTop: 0,
+                  //backgroundColor:"red"
+                }}
+              >
+                <Text style={{ fontSize: 24, fontWeight: "bold" }}>
+                  Tell us your day!
+                </Text>
+                <Text
+                  style={{ fontSize: 14, fontWeight: "bold", marginTop: 5 }}
+                >
+                  The following questions only take seconds to complete
+                </Text>
+              </View>
+
+              <View
+                style={{
+                  flex: 0.8,
+                  width: "80%",
+                  //backgroundColor: "red",
+                  flexDirection: "row",
+                  alignItems: "flex-start",
+                  top: "20%",
+                  justifyContent: "center",
+                }}
+              >
+                <View
+                  style={{
+                    display: this.state.isFirstStepVis,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      marginBottom: "10%",
+                    }}
+                  >
+                    Did you do any physical exercise today?
+                  </Text>
+                  <SwitchSelector
+                    options={[
+                      { label: "No", value: false },
+                      { label: "Yes", value: true },
+                    ]}
+                    initial={0}
+                    buttonMargin={5}
+                    borderWidth={2}
+                    borderColor="black"
+                    buttonColor="black"
+                    onPress={(value) =>
+                      // console.log(`Call onPress with value: ${value}`)
+                      {
+                        this.setState({ isActivityCompleted: value });
+                      }
+                    }
+                  />
+                </View>
+                <View
+                  style={{
+                    display: this.state.isSecondYesStepVis,
+                    justifyContent: "flex-start",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      marginBottom: "10%",
+                    }}
+                  >
+                    Did you do any other activities (if yes, what activity and
+                    when)?
+                  </Text>
+                  <View
+                    style={{
+                      flex: 0.1,
+
+                      marginTop: 10,
+                      width: "100%",
+                      borderWidth: 2,
+                      borderRadius: 30,
+                      borderColor: "#6E6E6E",
+                    }}
+                  >
+                    <TextInput
+                      // secureTextEntry={true}
+                      style={{
+                        flex: 0.5,
+                        marginLeft: 20,
+                        marginRight: 20,
+                        fontSize: 20,
+                      }}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      value={this.state.otherActivity}
+                      onChangeText={(text) => {
+                        this.setState({ otherActivity: text });
+                      }}
+                    />
+                  </View>
+                </View>
+                <View
+                  style={{
+                    display: this.state.isThirdYesStepVis,
+                    justifyContent: "flex-start",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      marginBottom: "10%",
+                    }}
+                  >
+                    How satisfied are you with today's activity?
+                  </Text>
+                  <SwitchSelector
+                    options={[
+                      { label: "😕 Negative", value: "Negative" },
+                      { label: "😑 Neutral", value: "Neutral" },
+                      { label: "🙂 Positive", value: "Positive" },
+                    ]}
+                    initial={1}
+                    buttonMargin={1}
+                    borderWidth={2}
+                    borderColor="black"
+                    buttonColor="black"
+                    onPress={(value) =>
+                      // console.log(`Call onPress with value: ${value}`)
+                      {
+                        this.setState({ feeling: value });
+                      }
+                    }
+                  />
+                </View>
+                <View
+                  style={{
+                    display: this.state.isSecondNoStepVis,
+                    justifyContent: "flex-start",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      marginBottom: "10%",
+                    }}
+                  >
+                    Tell us the reason why you didn't {this.eventToday.title} as
+                    planned
+                  </Text>
+                  <View
+                    style={{
+                      flex: 0.8,
+
+                      marginTop: 10,
+                      width: "100%",
+                      borderWidth: 2,
+                      borderRadius: 30,
+                      borderColor: "#6E6E6E",
+                    }}
+                  >
+                    <TextInput
+                      // secureTextEntry={true}
+                      style={{
+                        flex: 1,
+                        marginLeft: 20,
+                        marginRight: 20,
+                        fontSize: 20,
+                      }}
+                      maxLength={35}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      value={this.state.reason}
+                      onChangeText={(text) => {
+                        this.setState({ reason: text });
+                      }}
+                    />
+                  </View>
+                </View>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <Button
+                  title="Back"
+                  disabled={this.state.isBackBtnVis}
+                  onPress={() => {
+                    if (this.state.nextBtnState === "submit") {
+                      if (this.state.isActivityCompleted) {
+                        this.setState({ isBackBtnVis: false });
+                        this.setState({ isSecondYesStepVis: "flex" });
+                        this.setState({ isThirdYesStepVis: "none" });
+                        this.setState({ nextBtnState: "next2" });
+                        this.setState({ btnName: "Next" });
+                      } else {
+                        this.setState({ isBackBtnVis: false });
+                        this.setState({ isThirdYesStepVis: "none" });
+                        this.setState({ isFirstStepVis: "flex" });
+                        this.setState({ btnName: "Next" });
+                        this.setState({ nextBtnState: "next" });
+                      }
+                    } else if (this.state.nextBtnState === "next2") {
+                      this.setState({ nextBtnState: "next" });
+                      this.setState({ isBackBtnVis: true });
+                      this.setState({ isSecondYesStepVis: "none" });
+                      this.setState({ isFirstStepVis: "flex" });
+                    } else if (this.state.nextBtnState === "next2no") {
+                      this.setState({ nextBtnState: "next" });
+                      this.setState({ isBackBtnVis: true });
+                      this.setState({ isFirstStepVis: "flex" });
+                      this.setState({ isSecondNoStepVis: "none" });
+                    } else if (this.state.nextBtnState === "next3no") {
+                      this.setState({ nextBtnState: "next2no" });
+                      this.setState({ isBackBtnVis: false });
+                      this.setState({ isSecondNoStepVis: "flex" });
+                      this.setState({ isThirdNoStepVis: "none" });
+                    }
+                  }}
+                ></Button>
+                <Button
+                  title={this.state.btnName}
+                  onPress={async () => {
+                    if (this.state.nextBtnState === "submit") {
+                      this.setState({ isNoEventDayReportModalVis: false });
+                      this.setState({ nextBtnState: "next" });
+
+                      this.setState({ feeling: "Neutral" });
+                      this.setState({ isActivityCompleted: false });
+                      this.setState({ isThirtyMin: false });
+                      this.setState({ isFirstStepVis: "flex" });
+                      this.setState({ isSecondYesStepVis: "none" });
+                      this.setState({ isSecondNoStepVis: "none" });
+                      this.setState({ isThirdNoStepVis: "none" });
+                      this.setState({ isThirdYesStepVis: "none" });
+
+                      let dailyReport = {};
+                      dailyReport.isDailyReport = true;
+                      dailyReport.isExerciseToday = this.state.isActivityCompleted;
+                      if (this.state.isActivityCompleted) {
+                        dailyReport.otherActivity = this.state.otherActivity;
+                      } else {
+                        dailyReport.otherActivity = "none";
+                      }
+                      dailyReport.feeling = this.state.feeling;
+
+                      dailyReport.start = moment(new Date())
+                        .format()
+                        .slice(0, 19);
+                      dailyReport.end = dailyReport.start 
+
+                      let timeStamp = moment(new Date()).format();
+                      dailyReport.timeStamp = timeStamp;
+                      await this.dataModel.createNewPlan(
+                        this.userKey,
+                        dailyReport
+                      );
+
+                      // let eventToUpdate = this.eventToday;
+                      // eventToUpdate.isActivityCompleted = this.state.isActivityCompleted;
+                      // eventToUpdate.isReported = true;
+
+                      // eventToUpdate.isThirtyMin = this.state.isThirtyMin;
+                      // eventToUpdate.reason = this.state.reason;
+                      // eventToUpdate.otherActivity = this.state.otherActivity;
+                      // eventToUpdate.feeling = this.state.feeling;
+
+                      // await this.dataModel.updatePlan(
+                      //   this.userKey,
+                      //   eventToUpdate
+                      // );
+                      let eventList = this.state.eventsThisMonth;
+                      eventList.push(dailyReport);
+
+                      await this.setState({ eventsThisMonth: eventList });
+                      await this.dataModel.loadUserPlans(this.userKey);
+                      this.userPlans = this.dataModel.getUserPlans();
+                      this.setState({ feeling: "Neutral" });
+                      this.setState({ isActivityCompleted: false });
+                      this.setState({ isThirtyMin: false });
+                      this.setState({ otherActivity: "" });
+                      //this.updateView();
+                    } else if (this.state.nextBtnState === "next") {
+                      this.setState({ isBackBtnVis: false });
+                      this.setState({ isFirstStepVis: "none" });
+                      this.setState({ nextBtnState: "next2" });
+                      if (this.state.isActivityCompleted) {
+                        //this.setState({ submitBtnState: true });
+                        this.setState({ isSecondYesStepVis: "flex" });
+                        //this.setState({ isButtonFirstStage: false });
+                      } else {
+                        this.setState({ nextBtnState: "submit" });
+                        this.setState({ btnName: "Submit" });
+                        //this.setState({ submitBtnState: false });
+                        this.setState({ isThirdYesStepVis: "flex" });
+                      }
+                    } else if (
+                      this.state.nextBtnState === "next2" ||
+                      this.state.nextBtnState === "next3no"
+                    ) {
+                      this.setState({ btnName: "Submit" });
+                      this.setState({ nextBtnState: "submit" });
+                      this.setState({ isSecondYesStepVis: "none" });
+                      this.setState({ isThirdYesStepVis: "flex" });
+                      this.setState({ isThirdNoStepVis: "none" });
+                    } else if (this.state.nextBtnState === "next2no") {
+                      this.setState({ btnName: "next" });
+                      this.setState({ nextBtnState: "next3no" });
+                      this.setState({ isSecondNoStepVis: "none" });
+                      this.setState({ isThirdNoStepVis: "flex" });
+                    }
+                  }}
+                ></Button>
+              </View>
+            </View>
+          </View>
+        </Modal>
+        {/* eventReport */}
         <Modal
           animationType="slide"
           transparent={true}
@@ -1647,7 +2045,7 @@ export class CalendarPlanScreen extends React.Component {
                     optionTextStyle={{ fontWeight: "bold" }}
                     sectionTextStyle={{ fontWeight: "bold" }}
                     cancelStyle={{ backgroundColor: "grey", borderRadius: 15 }}
-                    cancelTextStyle={{ fontWeight: "bold", color:"white" }}
+                    cancelTextStyle={{ fontWeight: "bold", color: "white" }}
                     data={this.state.activityData}
                     initValue={this.state.activityPickerInitVal}
                     onChange={async (item) => {
@@ -1827,19 +2225,27 @@ export class CalendarPlanScreen extends React.Component {
                   style={{ fontSize: 16, marginLeft: 5 }}
                   placeholder="add self-defined activity"
                   value={this.state.userDefinedActivityText}
-                  onChangeText={(text) => this.setState({userDefinedActivityText:text})}
+                  onChangeText={(text) =>
+                    this.setState({ userDefinedActivityText: text })
+                  }
                 ></TextInput>
                 <View style={{}}>
                   <TouchableOpacity
-                    onPress={async() => {
+                    onPress={async () => {
                       let activityList = this.state.activityData;
                       // console.log("activityList",activityList);
                       this.index++;
-                      let newActivity = { key: this.index, label: this.state.userDefinedActivityText};
+                      let newActivity = {
+                        key: this.index,
+                        label: this.state.userDefinedActivityText,
+                      };
                       // console.log("newActivity",newActivity);
                       activityList.push(newActivity);
-                      this.setState({userDefinedActivityText:activityList});
-                      await this.dataModel.updateUserActivities(this.userKey,this.state.userDefinedActivityText);
+                      this.setState({ userDefinedActivityText: activityList });
+                      await this.dataModel.updateUserActivities(
+                        this.userKey,
+                        this.state.userDefinedActivityText
+                      );
                     }}
                   >
                     <Ionicons name="ios-add-circle" size={30} color={"black"} />

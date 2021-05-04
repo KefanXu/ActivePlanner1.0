@@ -26,15 +26,19 @@ export class LoginScreen extends React.Component {
       imageURI: "http://openweathermap.org/img/w/unknown.png",
     };
   }
-  componentDidMount = () => {
+  componentDidMount = async() => {
+    this.dataModel = getDataModel();
+    await this.dataModel.asyncInit();
     this.focusUnsubscribe = this.props.navigation.addListener(
       "focus",
       this.onFocus
     );
-    this.dataModel = getDataModel();
+    //
+    
   };
   onFocus = async () => {
     await this.dataModel.asyncInit();
+    this.dataModel = getDataModel();
   };
 
   fetchWeatherInfo = async (userPlans) => {
