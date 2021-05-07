@@ -34,15 +34,6 @@ import SwitchSelector from "react-native-switch-selector";
 import ModalSelector from "react-native-modal-selector";
 import { FlatList } from "react-native-gesture-handler";
 
-// let index = 0;
-// const data = [
-//   { key: index++, section: true, label: "Physical Activities" },
-//   { key: index++, label: "Walking" },
-//   { key: index++, label: "Jogging" },
-//   { key: index++, label: "Dancing" },
-//   { key: index++, label: "Gardening" },
-// ];
-
 const WEEKDAY = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export class CalendarPlanScreen extends React.Component {
@@ -109,6 +100,7 @@ export class CalendarPlanScreen extends React.Component {
     this.pastPlans = [];
     this.futurePlans = [];
     this.planToday = [];
+
     let todayDate = new Date();
     for (let event of this.userPlans) {
       if (event.title && !event.isDeleted) {
@@ -204,6 +196,8 @@ export class CalendarPlanScreen extends React.Component {
       }
     }
     this.isNoEventDayReportModalVis = false;
+    this.isPlannedToday = false;
+    this.isPlannedDate = new Date();
     this.reportPopUp(this.userPlans);
     this.state = {
       isMonthCalVis: true,
@@ -279,6 +273,8 @@ export class CalendarPlanScreen extends React.Component {
       userDefinedActivityText: "",
 
       isNoEventDayReportModalVis: this.isNoEventDayReportModalVis,
+      isPlannedToday: this.isPlannedToday,
+      isPlannedDate: this.isPlannedDate,
     };
     //console.log("weatherThisMonth",this.state.weatherThisMonth);
     // this.monthCalRef = React.createRef();
@@ -320,7 +316,7 @@ export class CalendarPlanScreen extends React.Component {
     for (let event of userPlanList) {
       if (event.end && !event.isDeleted) {
         let eventDate = event.end.slice(0, 10);
-        console.log("eventDate", eventDate);
+        //console.log("eventDate", eventDate);
         if (eventDate === currentDate) {
           console.log("isNoEventToday", isNoEventToday);
           isNoEventToday = false;
@@ -333,6 +329,13 @@ export class CalendarPlanScreen extends React.Component {
             this.eventToday = event;
           }
         }
+        if (event.title) {
+          if (event.timeStamp.slice(0, 10) === currentDate) {
+            this.isPlannedToday = true;
+            this.isPlannedDate = event.start.slice(0, 10);
+          }
+        }
+        //console.log(this.isPlannedToday);
       }
     }
     if (isNoEventToday) {
@@ -522,6 +525,16 @@ export class CalendarPlanScreen extends React.Component {
   //   console.log("updateMonthCalView()",this.state.eventsThisMonth);
   // }
   onPlanBtnPressed = async () => {
+    if (this.state.isPlannedToday) {
+      Alert.alert(
+        "You already planned today",
+        "You could delete the planned activity on " +
+          this.state.isPlannedDate +
+          " and start a new one",
+        [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+      );
+      return;
+    }
     if (!this.selectedActivity) {
       Alert.alert("Please select an activity", "Activity Type Missing", [
         { text: "OK", onPress: () => console.log("OK Pressed") },
@@ -546,12 +559,13 @@ export class CalendarPlanScreen extends React.Component {
     }
     let planable = true;
     for (let event of this.userPlans) {
-      if (event.title && !event.isDeleted) {
+      if (event.title && event.isDeleted === false) {
         let eventDate = new Date(event.start);
         if (
           eventDate.getMonth() === this.state.timePickerDate.getMonth() &&
           eventDate.getDate() === this.state.timePickerDate.getDate()
         ) {
+          console.log("event.title", event);
           planable = false;
         }
       }
@@ -630,14 +644,22 @@ export class CalendarPlanScreen extends React.Component {
     await this.dataModel.createNewPlan(this.userKey, newEvent);
     await this.dataModel.loadUserPlans(this.userKey);
     this.userPlans = this.dataModel.getUserPlans();
+    let updateNewEventFromFireBase;
+    for (let event of this.userPlans) {
+      if (event.timeStamp === timeStamp) {
+        updateNewEventFromFireBase = event;
+      }
+    }
 
     let updateFuturePlanList = this.state.futurePlans;
 
-    updateFuturePlanList.push(newEvent);
+    updateFuturePlanList.push(updateNewEventFromFireBase);
     updateFuturePlanList.sort((a, b) => {
       return new Date(a.start) - new Date(b.start);
     });
     this.setState({ futurePlans: updateFuturePlanList });
+    this.setState({ isPlannedToday: true });
+    this.setState({ isPlannedDate: newEvent.start });
     Alert.alert(
       "Activity Planned",
       newEvent.title +
@@ -663,7 +685,7 @@ export class CalendarPlanScreen extends React.Component {
     // this.monthCalRef.current.reSetEvents(this.state.eventsThisMonth);
   };
   onDeletePressed = async () => {
-    console.log(this.eventToday);
+    //console.log(this.eventToday);
 
     this.setState({ isPlannedEventModalVis: false });
     this.eventToday.isDeleted = true;
@@ -690,7 +712,7 @@ export class CalendarPlanScreen extends React.Component {
       this.combinedEventListNext.splice(deleteIndex, 1);
       await this.setState({ eventsThisMonth: this.combinedEventListNext });
     }
-    this.updateView();
+    //this.updateView();
   };
   updateView = () => {
     //console.log("this.state.eventsThisMonth", this.state.eventsThisMonth);
@@ -1120,7 +1142,7 @@ export class CalendarPlanScreen extends React.Component {
                       dailyReport.start = moment(new Date())
                         .format()
                         .slice(0, 19);
-                      dailyReport.end = dailyReport.start 
+                      dailyReport.end = dailyReport.start;
 
                       let timeStamp = moment(new Date()).format();
                       dailyReport.timeStamp = timeStamp;
@@ -1814,17 +1836,31 @@ export class CalendarPlanScreen extends React.Component {
                         <TouchableOpacity
                           disabled={false}
                           onPress={async () => {
+                            console.log("delete item", item);
                             item.isDeleted = true;
+                            if (
+                              item.timeStamp.slice(0, 10) ===
+                              moment(new Date()).format().slice(0, 10)
+                            ) {
+                              this.setState({ isPlannedToday: false });
+                            }
+                            await this.dataModel.updatePlan(this.userKey, item);
+
                             let updateList = this.state.futurePlans;
                             let index = updateList.indexOf(item);
                             if (index > -1) {
                               updateList.splice(index, 1);
                             }
-                            this.setState({ futurePlans: updateList });
-                            await this.dataModel.updatePlan(this.userKey, item);
+
+                            await this.setState({ futurePlans: updateList });
 
                             await this.dataModel.loadUserPlans(this.userKey);
                             this.userPlans = this.dataModel.getUserPlans();
+                            for (let event of this.userPlans) {
+                              if (event.key === item.key) {
+                                event.isDeleted = true;
+                              }
+                            }
                           }}
                           style={{
                             backgroundColor: "black",

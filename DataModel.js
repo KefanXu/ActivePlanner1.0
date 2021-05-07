@@ -76,9 +76,24 @@ class DataModel {
       let plan = qDocSnap.data();
       plan.key = key;
       this.plans.push(plan);
+      if (plan.start) {
+        if (plan.start.slice(0,10) === "2021-05-07") {
+          console.log("loadUserPlans",plan);  
+        }
+      }
     });
   };
   getUserPlans = () => {
+    for (let event of this.plans) {
+      if (event.start) {
+      if (event.start.slice(0,10) === "2021-05-07") {
+       console.log("getUserPlans",event);  
+      }
+      }
+
+    }
+    
+
     return this.plans;
   };
 
