@@ -662,9 +662,8 @@ export class CalendarPlanScreen extends React.Component {
       newEvent
     );
 
-    newEvent.reportReminderKey = await this.dataModel.scheduleReportNotification(
-      newEvent
-    );
+    newEvent.reportReminderKey =
+      await this.dataModel.scheduleReportNotification(newEvent);
     await this.dataModel.createNewPlan(this.userKey, newEvent);
     await this.dataModel.loadUserPlans(this.userKey);
     this.userPlans = this.dataModel.getUserPlans();
@@ -892,16 +891,18 @@ export class CalendarPlanScreen extends React.Component {
                   <TouchableOpacity
                     onPress={() => {
                       this.setState({ isNoEventDayReportModalVis: false });
-                      this.setState({ feeling: "Neutral" });
-                      this.setState({ isActivityCompleted: false });
-                      this.setState({ isThirtyMin: false });
-                      this.setState({ isFirstStepVis: "flex" });
-                      this.setState({ isSecondYesStepVis: "none" });
-                      this.setState({ isThirdYesStepVis: "none" });
-                      this.setState({ isSecondNoStepVis: "none" });
-                      this.setState({ isThirdNoStepVis: "none" });
-                      this.setState({ nextBtnState: "next" });
-                      this.setState({ otherActivity: "" });
+                      // this.setState({ feeling: "Neutral" });
+                      // this.setState({ isActivityCompleted: false });
+                      // this.setState({ isThirtyMin: false });
+                      // this.setState({ isFirstStepVis: "flex" });
+                      // this.setState({ isSecondYesStepVis: "none" });
+                      // this.setState({ isThirdYesStepVis: "none" });
+                      // this.setState({ isSecondNoStepVis: "none" });
+                      // this.setState({ isThirdNoStepVis: "none" });
+                      // this.setState({ nextBtnState: "next" });
+                      // this.setState({ otherActivity: "" });
+
+                      this.resetReport();
                     }}
                   >
                     <MaterialIcons name="cancel" size={24} color="black" />
@@ -1155,7 +1156,8 @@ export class CalendarPlanScreen extends React.Component {
 
                       let dailyReport = {};
                       dailyReport.isDailyReport = true;
-                      dailyReport.isExerciseToday = this.state.isActivityCompleted;
+                      dailyReport.isExerciseToday =
+                        this.state.isActivityCompleted;
                       if (this.state.isActivityCompleted) {
                         dailyReport.otherActivity = this.state.otherActivity;
                       } else {
@@ -1281,9 +1283,11 @@ export class CalendarPlanScreen extends React.Component {
                 }}
               >
                 <View>
-                  <TouchableOpacity onPress={() => {
-                    this.resetReport();
-                  }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      this.resetReport();
+                    }}
+                  >
                     <MaterialIcons name="cancel" size={24} color="black" />
                   </TouchableOpacity>
                 </View>
@@ -1575,7 +1579,7 @@ export class CalendarPlanScreen extends React.Component {
                       this.setState({ isBackBtnVis: true });
                       this.setState({ isFirstStepVis: "flex" });
                       this.setState({ isSecondNoStepVis: "none" });
-                      this.setState({ reason: "" });
+                      //this.setState({ reason: "" });
                       this.setState({ isActivityCompleted: false });
                     } else if (this.state.nextBtnState === "next3no") {
                       this.setState({ nextBtnState: "next2no" });
@@ -1588,7 +1592,7 @@ export class CalendarPlanScreen extends React.Component {
                       this.setState({ isSecondYesStepVis: "flex" });
                       this.setState({ nextBtnState: "next3no" });
                       this.setState({ isThirtyMin: true });
-                      this.setState({ otherActivity: "" });
+                      //this.setState({ otherActivity: "" });
                       //this.setState({ secSwitchSelectorInitVal: 0});
                     }
                   }}
@@ -1633,16 +1637,23 @@ export class CalendarPlanScreen extends React.Component {
                       this.resetReport();
 
                       let eventToUpdate = this.eventToday;
-                      eventToUpdate.isActivityCompleted = this.state.isActivityCompleted;
+                      eventToUpdate.isActivityCompleted =
+                        this.state.isActivityCompleted;
                       eventToUpdate.isReported = true;
                       if (this.state.isActivityCompleted) {
                         eventToUpdate.isThirtyMin = "";
+                        eventToUpdate.reason = "";
                       } else {
                         eventToUpdate.isThirtyMin = this.state.isThirtyMin;
+                        eventToUpdate.reason = this.state.reason;
+                        if (this.state.isThirtyMin) {
+                          eventToUpdate.otherActivity = ""
+                        } else {
+                          eventToUpdate.otherActivity = this.state.otherActivity;
+                        }
                       }
-
-                      eventToUpdate.reason = this.state.reason;
-                      eventToUpdate.otherActivity = this.state.otherActivity;
+                      
+                      
                       if (
                         !this.state.isActivityCompleted &&
                         !this.state.isThirtyMin
@@ -2032,13 +2043,13 @@ export class CalendarPlanScreen extends React.Component {
           </View>
         </View>
         <SlidingUpPanel
-          draggableRange={{ top: 300, bottom: 100 }}
+          draggableRange={{ top: 400, bottom: 100 }}
           showBackdrop={false}
           ref={(c) => (this._panel = c)}
         >
           <View
             style={{
-              height: 300,
+              height: 400,
               justifyContent: "space-between",
               flexDirection: "column",
               alignItems: "center",
@@ -2110,6 +2121,280 @@ export class CalendarPlanScreen extends React.Component {
                 flex: 0.4,
                 width: "90%",
                 borderRadius: 20,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginTop: 20,
+                backgroundColor: "#6E6E6E",
+              }}
+            >
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  width: "95%",
+                  height: "90%",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingLeft: 10,
+                  paddingRight: 10,
+                  marginBottom: 10,
+
+                  //backgroundColor: "white",
+                  borderRadius: 15,
+                  //backgroundColor: "blue",
+                }}
+              >
+                <View
+                  style={{
+                    flex: 0.5,
+                    marginRight:5,
+                    flexDirection: "column",
+                    height: "100%",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <View style={{ flex: 0.5, justifyContent: "center" }}>
+                    <Text
+                      style={{
+                        margin: 5,
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        fontSize: 14,
+                        color: "white",
+                      }}
+                    >
+                      Activity
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flex: 0.5,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "white",
+                      borderRadius: 20,
+                    }}
+                  >
+                    <ModalSelector
+                      style={{ borderWidth: 0 }}
+                      // touchableStyle={{ color: "white" }}
+                      optionContainerStyle={{ borderWidth: 0 }}
+                      selectStyle={{ borderWidth: 0 }}
+                      selectTextStyle={{
+                        textAlign: "left",
+                        color: "blue",
+                        fontWeight: "bold",
+                      }}
+                      initValueTextStyle={{
+                        textAlign: "left",
+                        color: "blue",
+                        fontWeight: "bold",
+                      }}
+                      backdropPressToClose={true}
+                      overlayStyle={{
+                        flex: 1,
+                        padding: "5%",
+                        justifyContent: "center",
+                        backgroundColor: "rgba(0,0,0,0)",
+                      }}
+                      optionContainerStyle={{
+                        backgroundColor: "white",
+                        borderRadius: 15,
+                      }}
+                      optionTextStyle={{ fontWeight: "bold" }}
+                      sectionTextStyle={{ fontWeight: "bold" }}
+                      cancelStyle={{
+                        backgroundColor: "grey",
+                        borderRadius: 15,
+                      }}
+                      cancelTextStyle={{ fontWeight: "bold", color: "white" }}
+                      data={this.state.activityData}
+                      initValue={this.state.activityPickerInitVal}
+                      onChange={async (item) => {
+                        this.selectedActivity = item.label;
+                        this.isActivitySelected = true;
+                        let newListByActivity = [];
+                        let currentList = [];
+                        if (!this.state.timeFilteredList) {
+                          if (
+                            this.state.monthCalCurrentMonth ===
+                            this.state.date.getMonth()
+                          ) {
+                            currentList = this.combinedEventListThis;
+                          } else if (
+                            this.state.monthCalCurrentMonth ===
+                            this.state.date.getMonth() - 1
+                          ) {
+                            currentList = this.combinedEventListLast;
+                          } else {
+                            currentList = this.combinedEventListNext;
+                          }
+                          this.setState({ eventFilteredList: true });
+                        } else {
+                          currentList = this.state.eventsThisMonth;
+                          this.setState({ eventFilteredList: false });
+                        }
+
+                        let eventListDates = [];
+                        for (let event of currentList) {
+                          let dateNum = String(event.start.slice(8, 10));
+                          if (!eventListDates.includes(dateNum)) {
+                            eventListDates.push(dateNum);
+                          }
+                        }
+
+                        let dayEventsList = [];
+                        for (let dateNum of eventListDates) {
+                          let dayEventObj = {
+                            dateNum: parseInt(dateNum),
+                            dayEvents: [],
+                            isFiltered: false,
+                          };
+                          dayEventsList.push(dayEventObj);
+                        }
+
+                        for (let date of dayEventsList) {
+                          for (let event of currentList) {
+                            let dateNum = parseInt(event.start.slice(8, 10));
+                            if (dateNum === date.dateNum) {
+                              let newEvent = event;
+                              date.dayEvents.push(newEvent);
+                            }
+                          }
+                        }
+
+                        let newEventList = [];
+
+                        for (let date of dayEventsList) {
+                          for (let event of date.dayEvents) {
+                            if (event.title) {
+                              if (event.title === item.label) {
+                                date.isFiltered = true;
+                              }
+                            }
+                          }
+                        }
+
+                        for (let date of dayEventsList) {
+                          if (date.isFiltered) {
+                            for (let event of date.dayEvents) {
+                              newEventList.push(event);
+                            }
+                          }
+                        }
+
+                        // this.setState({activityPickerInitVal:"none"})
+
+                        await this.setState({ eventsThisMonth: newEventList });
+
+                        //this.monthCalRef.current.processEvents();
+                      }}
+                    />
+                  </View>
+                </View>
+                <View
+                  style={{
+                    flex: 0.5,
+                    flexDirection: "column",
+                    height: "100%",
+                    justifyContent: "space-between",
+                    marginLeft:5,
+                  }}
+                >
+                  <View style={{ flex: 0.5, justifyContent: "center" }}>
+                    <Text
+                      style={{
+                        margin: 5,
+                        fontWeight: "bold",
+                        textAlign: "center",
+                        fontSize: 14,
+                        color: "white",
+                      }}
+                    >
+                      Add New Activity
+                    </Text>
+                  </View>
+                  <View
+                    style={{
+                      flex: 0.5,
+                      backgroundColor: "white",
+                      height: "100%",
+                      borderRadius: 20,
+                      borderWidth: 2,
+                      borderColor: "black",
+                      marginRight: 0,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <TextInput
+                      style={{ fontSize: 16, marginLeft: 10 }}
+                      placeholder="add new activity"
+                      value={this.state.userDefinedActivityText}
+                      onChangeText={(text) =>
+                        this.setState({ userDefinedActivityText: text })
+                      }
+                    ></TextInput>
+                    <View>
+                      <TouchableOpacity
+                        onPress={async () => {
+                          let activityList = this.state.activityData;
+                          // console.log("activityList",activityList);
+                          this.index++;
+                          let newActivity = {
+                            key: this.index,
+                            label: this.state.userDefinedActivityText,
+                          };
+                          for (let activity of activityList) {
+                            let activityToLowerCase =
+                              activity.label.toLowerCase();
+                            let newActivityToLowerCase =
+                              this.state.userDefinedActivityText.toLowerCase();
+                            if (
+                              activityToLowerCase === newActivityToLowerCase
+                            ) {
+                              Alert.alert(
+                                this.state.userDefinedActivityText +
+                                  " already existed",
+                                "Please add another activity",
+                                [
+                                  {
+                                    text: "OK",
+                                    onPress: () => console.log("OK Pressed"),
+                                  },
+                                ]
+                              );
+                              this.setState({ userDefinedActivityText: "" });
+                              return;
+                            }
+                          }
+                          // console.log("newActivity",newActivity);
+                          activityList.push(newActivity);
+                          this.setState({ userDefinedActivityText: "" });
+                          await this.dataModel.updateUserActivities(
+                            this.userKey,
+                            this.state.userDefinedActivityText
+                          );
+                        }}
+                      >
+                        <Ionicons
+                          name="ios-add-circle"
+                          size={30}
+                          color={"black"}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View
+              style={{
+                flex: 0.4,
+                width: "90%",
+                borderRadius: 20,
                 flexDirection: "column",
                 justifyContent: "space-between",
                 alignItems: "center",
@@ -2127,21 +2412,9 @@ export class CalendarPlanScreen extends React.Component {
                   alignItems: "center",
                   paddingLeft: 10,
                   paddingRight: 10,
+                  //backgroundColor:"red"
                 }}
               >
-                <View style={{ flex: 1, justifyContent: "center" }}>
-                  <Text
-                    style={{
-                      margin: 5,
-                      fontWeight: "bold",
-                      textAlign: "center",
-                      fontSize: 14,
-                      color: "white",
-                    }}
-                  >
-                    Activity
-                  </Text>
-                </View>
                 <View style={{ flex: 1, justifyContent: "center" }}>
                   <Text
                     style={{
@@ -2193,126 +2466,6 @@ export class CalendarPlanScreen extends React.Component {
                     alignItems: "center",
                   }}
                 >
-                  <ModalSelector
-                    style={{ borderWidth: 0 }}
-                    // touchableStyle={{ color: "white" }}
-                    optionContainerStyle={{ borderWidth: 0 }}
-                    selectStyle={{ borderWidth: 0 }}
-                    selectTextStyle={{
-                      textAlign: "left",
-                      color: "blue",
-                      fontWeight: "bold",
-                    }}
-                    initValueTextStyle={{
-                      textAlign: "left",
-                      color: "blue",
-                      fontWeight: "bold",
-                    }}
-                    backdropPressToClose={true}
-                    overlayStyle={{
-                      flex: 1,
-                      padding: "5%",
-                      justifyContent: "center",
-                      backgroundColor: "rgba(0,0,0,0)",
-                    }}
-                    optionContainerStyle={{
-                      backgroundColor: "white",
-                      borderRadius: 15,
-                    }}
-                    optionTextStyle={{ fontWeight: "bold" }}
-                    sectionTextStyle={{ fontWeight: "bold" }}
-                    cancelStyle={{ backgroundColor: "grey", borderRadius: 15 }}
-                    cancelTextStyle={{ fontWeight: "bold", color: "white" }}
-                    data={this.state.activityData}
-                    initValue={this.state.activityPickerInitVal}
-                    onChange={async (item) => {
-                      this.selectedActivity = item.label;
-                      this.isActivitySelected = true;
-                      let newListByActivity = [];
-                      let currentList = [];
-                      if (!this.state.timeFilteredList) {
-                        if (
-                          this.state.monthCalCurrentMonth ===
-                          this.state.date.getMonth()
-                        ) {
-                          currentList = this.combinedEventListThis;
-                        } else if (
-                          this.state.monthCalCurrentMonth ===
-                          this.state.date.getMonth() - 1
-                        ) {
-                          currentList = this.combinedEventListLast;
-                        } else {
-                          currentList = this.combinedEventListNext;
-                        }
-                        this.setState({ eventFilteredList: true });
-                      } else {
-                        currentList = this.state.eventsThisMonth;
-                        this.setState({ eventFilteredList: false });
-                      }
-
-                      let eventListDates = [];
-                      for (let event of currentList) {
-                        let dateNum = String(event.start.slice(8, 10));
-                        if (!eventListDates.includes(dateNum)) {
-                          eventListDates.push(dateNum);
-                        }
-                      }
-
-                      let dayEventsList = [];
-                      for (let dateNum of eventListDates) {
-                        let dayEventObj = {
-                          dateNum: parseInt(dateNum),
-                          dayEvents: [],
-                          isFiltered: false,
-                        };
-                        dayEventsList.push(dayEventObj);
-                      }
-
-                      for (let date of dayEventsList) {
-                        for (let event of currentList) {
-                          let dateNum = parseInt(event.start.slice(8, 10));
-                          if (dateNum === date.dateNum) {
-                            let newEvent = event;
-                            date.dayEvents.push(newEvent);
-                          }
-                        }
-                      }
-
-                      let newEventList = [];
-
-                      for (let date of dayEventsList) {
-                        for (let event of date.dayEvents) {
-                          if (event.title) {
-                            if (event.title === item.label) {
-                              date.isFiltered = true;
-                            }
-                          }
-                        }
-                      }
-
-                      for (let date of dayEventsList) {
-                        if (date.isFiltered) {
-                          for (let event of date.dayEvents) {
-                            newEventList.push(event);
-                          }
-                        }
-                      }
-
-                      // this.setState({activityPickerInitVal:"none"})
-
-                      await this.setState({ eventsThisMonth: newEventList });
-
-                      //this.monthCalRef.current.processEvents();
-                    }}
-                  />
-                </View>
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
                   <DateTimePicker
                     value={this.state.timePickerDate}
                     mode="default"
@@ -2354,7 +2507,7 @@ export class CalendarPlanScreen extends React.Component {
                       alignSelf: "center",
                       flexWrap: "wrap",
                       position: "absolute",
-                      left: "6%",
+                      left: "25%",
                     }}
                   />
                 </View>
@@ -2380,74 +2533,10 @@ export class CalendarPlanScreen extends React.Component {
                 width: "90%",
                 //backgroundColor:"red",
                 borderRadius: 20,
-                justifyContent: "space-between",
+                justifyContent: "flex-end",
                 marginTop: 20,
               }}
             >
-              <View
-                style={{
-                  flex: 0.7,
-                  backgroundColor: "white",
-                  height: 50,
-                  borderRadius: 15,
-                  borderWidth: 2,
-                  borderColor: "black",
-                  marginRight: 10,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <TextInput
-                  style={{ fontSize: 16, marginLeft: 5 }}
-                  placeholder="add new activity"
-                  value={this.state.userDefinedActivityText}
-                  onChangeText={(text) =>
-                    this.setState({ userDefinedActivityText: text })
-                  }
-                ></TextInput>
-                <View style={{}}>
-                  <TouchableOpacity
-                    onPress={async () => {
-                      let activityList = this.state.activityData;
-                      // console.log("activityList",activityList);
-                      this.index++;
-                      let newActivity = {
-                        key: this.index,
-                        label: this.state.userDefinedActivityText,
-                      };
-                      for (let activity of activityList) {
-                        let activityToLowerCase = activity.label.toLowerCase();
-                        let newActivityToLowerCase = this.state.userDefinedActivityText.toLowerCase();
-                        if (activityToLowerCase === newActivityToLowerCase) {
-                          Alert.alert(
-                            this.state.userDefinedActivityText +
-                              " already existed",
-                            "Please add another activity",
-                            [
-                              {
-                                text: "OK",
-                                onPress: () => console.log("OK Pressed"),
-                              },
-                            ]
-                          );
-                          this.setState({ userDefinedActivityText: "" });
-                          return;
-                        }
-                      }
-                      // console.log("newActivity",newActivity);
-                      activityList.push(newActivity);
-                      this.setState({ userDefinedActivityText: "" });
-                      await this.dataModel.updateUserActivities(
-                        this.userKey,
-                        this.state.userDefinedActivityText
-                      );
-                    }}
-                  >
-                    <Ionicons name="ios-add-circle" size={30} color={"black"} />
-                  </TouchableOpacity>
-                </View>
-              </View>
               <TouchableOpacity
                 disabled={false}
                 onPress={() => this.onPlanBtnPressed()}
