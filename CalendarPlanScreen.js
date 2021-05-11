@@ -198,6 +198,7 @@ export class CalendarPlanScreen extends React.Component {
     this.isNoEventDayReportModalVis = false;
     this.isPlannedToday = false;
     this.isPlannedDate = new Date();
+    this.isDailyReportBtnDisabled = true;
     this.reportPopUp(this.userPlans);
     this.state = {
       isMonthCalVis: true,
@@ -275,6 +276,8 @@ export class CalendarPlanScreen extends React.Component {
       isNoEventDayReportModalVis: this.isNoEventDayReportModalVis,
       isPlannedToday: this.isPlannedToday,
       isPlannedDate: this.isPlannedDate,
+
+      isDailyReportBtnDisabled: this.isDailyReportBtnDisabled,
     };
     //console.log("weatherThisMonth",this.state.weatherThisMonth);
     // this.monthCalRef = React.createRef();
@@ -340,6 +343,7 @@ export class CalendarPlanScreen extends React.Component {
     }
     if (isNoEventToday) {
       this.isNoEventDayReportModalVis = true;
+      this.isDailyReportBtnDisabled = false;
     }
     //console.log("this.isReportModalVis", this.isReportModalVis);
   };
@@ -893,7 +897,7 @@ export class CalendarPlanScreen extends React.Component {
                 }}
               >
                 <Text style={{ fontSize: 24, fontWeight: "bold" }}>
-                  Tell us your day!
+                  Tell us about your day!
                 </Text>
                 <Text
                   style={{ fontSize: 14, fontWeight: "bold", marginTop: 5 }}
@@ -961,8 +965,8 @@ export class CalendarPlanScreen extends React.Component {
                       marginBottom: "10%",
                     }}
                   >
-                    Did you do any other activities (if yes, what activity and
-                    when)?
+                    if yes, what activity and
+                    when?
                   </Text>
                   <View
                     style={{
@@ -978,7 +982,7 @@ export class CalendarPlanScreen extends React.Component {
                     <TextInput
                       // secureTextEntry={true}
                       style={{
-                        flex: 0.5,
+                        flex: 1,
                         marginLeft: 20,
                         marginRight: 20,
                         fontSize: 20,
@@ -1117,6 +1121,7 @@ export class CalendarPlanScreen extends React.Component {
                   title={this.state.btnName}
                   onPress={async () => {
                     if (this.state.nextBtnState === "submit") {
+                      this.setState({isDailyReportBtnDisabled: true});
                       this.setState({ isNoEventDayReportModalVis: false });
                       this.setState({ nextBtnState: "next" });
 
@@ -1285,7 +1290,7 @@ export class CalendarPlanScreen extends React.Component {
                 }}
               >
                 <Text style={{ fontSize: 24, fontWeight: "bold" }}>
-                  Tell us your day!
+                  Tell us about your day!
                 </Text>
                 <Text
                   style={{ fontSize: 14, fontWeight: "bold", marginTop: 5 }}
@@ -1641,6 +1646,7 @@ export class CalendarPlanScreen extends React.Component {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
+            top: "5%",
             //backgroundColor:"blue"
           }}
         >
@@ -1650,6 +1656,8 @@ export class CalendarPlanScreen extends React.Component {
               height: "100%",
               justifyContent: "space-between",
               alignItems: "center",
+             
+              
             }}
           >
             <View
@@ -1657,13 +1665,35 @@ export class CalendarPlanScreen extends React.Component {
                 marginTop: "5%",
                 flex: 0.1,
                 width: "75%",
-                justifyContent: "center",
-                alignItems: "flex-start",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                //backgroundColor:"red"
+               
               }}
             >
               <Text style={{ fontSize: 25, fontWeight: "bold" }}>
                 Activity Today
               </Text>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "black",
+                  color: "white",
+                  width: 60,
+                  height: 25,
+                  borderRadius: 30,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                disabled={this.state.isDailyReportBtnDisabled}
+                onPress={() => this.setState({ isNoEventDayReportModalVis: true })}
+              >
+                <Text
+                  style={{ color: "white", fontWeight: "bold", fontSize: 15 }}
+                >
+                  Report
+                </Text>
+              </TouchableOpacity>
             </View>
             <View style={{ flex: 0.1 }}>{planTodayView}</View>
 
@@ -2259,7 +2289,7 @@ export class CalendarPlanScreen extends React.Component {
               >
                 <TextInput
                   style={{ fontSize: 16, marginLeft: 5 }}
-                  placeholder="add self-defined activity"
+                  placeholder="add new activity"
                   value={this.state.userDefinedActivityText}
                   onChangeText={(text) =>
                     this.setState({ userDefinedActivityText: text })
@@ -2275,9 +2305,28 @@ export class CalendarPlanScreen extends React.Component {
                         key: this.index,
                         label: this.state.userDefinedActivityText,
                       };
+                      for (let activity of activityList) {
+                        let activityToLowerCase = activity.label.toLowerCase();
+                        let newActivityToLowerCase = this.state.userDefinedActivityText.toLowerCase();
+                        if (activityToLowerCase === newActivityToLowerCase) {
+                          Alert.alert(
+                            this.state.userDefinedActivityText +
+                              " already existed",
+                            "Please add another activity",
+                            [
+                              {
+                                text: "OK",
+                                onPress: () => console.log("OK Pressed"),
+                              },
+                            ]
+                          );
+                          this.setState({ userDefinedActivityText: "" });
+                          return;
+                        }
+                      }
                       // console.log("newActivity",newActivity);
                       activityList.push(newActivity);
-                      this.setState({ userDefinedActivityText: activityList });
+                      this.setState({ userDefinedActivityText: "" });
                       await this.dataModel.updateUserActivities(
                         this.userKey,
                         this.state.userDefinedActivityText

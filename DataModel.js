@@ -43,6 +43,10 @@ class DataModel {
   }
 
   asyncInit = async () => {
+    this.usersRef = firebase.firestore().collection("users");
+    this.users = [];
+    this.plans = [];
+    this.key = "";
     await this.loadUsers();
     //console.log("this.users", this.users);
   };
@@ -63,8 +67,8 @@ class DataModel {
         this.users.push(data);
       }
     });
-    console.log("load user", this.users.length);
-    console.log("this.users", this.users);
+    //console.log("load user", this.users.length);
+    //console.log("this.users", this.users);
   };
   loadUserPlans = async (key) => {
     let userPlanCollection = await this.usersRef
@@ -76,23 +80,17 @@ class DataModel {
       let plan = qDocSnap.data();
       plan.key = key;
       this.plans.push(plan);
-      if (plan.start) {
-        if (plan.start.slice(0,10) === "2021-05-07") {
-          console.log("loadUserPlans",plan);  
-        }
-      }
     });
+    console.log("loadUserPlans");
   };
   getUserPlans = () => {
     for (let event of this.plans) {
       if (event.start) {
-      if (event.start.slice(0,10) === "2021-05-07") {
-       console.log("getUserPlans",event);  
+        if (event.start.slice(0, 10) === "2021-05-07") {
+          console.log("getUserPlans", event);
+        }
       }
-      }
-
     }
-    
 
     return this.plans;
   };
@@ -178,8 +176,8 @@ class DataModel {
     await activityList.add(userActivityList);
   };
   updateUserActivities = async (key, activity) => {
-    console.log("key",key);
-    console.log("activity",activity);
+    console.log("key", key);
+    console.log("activity", activity);
     let activityQuerySnap = await this.usersRef
       .doc(key)
       .collection("my_activities")
@@ -194,13 +192,14 @@ class DataModel {
     userActivityList[0].activityList.push(activity);
     let updatedList = {
       activityList: userActivityList[0].activityList,
-    }
-    console.log("updatedList",updatedList);
-    console.log("docKey",docKey);
+    };
+    //console.log("updatedList",updatedList);
+    //console.log("docKey",docKey);
     await this.usersRef
       .doc(key)
-      .collection("my_activities").doc(docKey).update(updatedList);
-
+      .collection("my_activities")
+      .doc(docKey)
+      .update(updatedList);
   };
   getUserActivities = async (key) => {
     let activityQuerySnap = await this.usersRef
@@ -211,7 +210,7 @@ class DataModel {
 
     activityQuerySnap.forEach((qDocSnap) => {
       let data = qDocSnap.data();
-      
+
       userActivityList.push(data);
     });
     return userActivityList;
