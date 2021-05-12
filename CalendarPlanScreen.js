@@ -199,6 +199,8 @@ export class CalendarPlanScreen extends React.Component {
     this.isPlannedToday = false;
     this.isPlannedDate = new Date();
     this.isDailyReportBtnDisabled = true;
+    this.btnName = "Next";
+    this.nextBtnState = "next";
     this.reportPopUp(this.userPlans);
     this.state = {
       isMonthCalVis: true,
@@ -218,7 +220,7 @@ export class CalendarPlanScreen extends React.Component {
       isDayReportModalVis: false,
       //Update Report Modal
       isActivityCompleted: false,
-      isThirtyMin: false,
+      isOtherActivity: false,
 
       isFirstStepVis: "flex",
       isSecondYesStepVis: "none",
@@ -233,8 +235,8 @@ export class CalendarPlanScreen extends React.Component {
 
       //Update Report Modal Button
       isButtonFirstStage: true,
-      btnName: "Next",
-      nextBtnState: "next",
+      btnName: this.btnName,
+      nextBtnState: this.nextBtnState,
       submitBtnState: true,
       reason: "",
       feeling: "Neutral",
@@ -346,6 +348,8 @@ export class CalendarPlanScreen extends React.Component {
     if (isNoEventToday) {
       this.isNoEventDayReportModalVis = true;
       this.isDailyReportBtnDisabled = false;
+      this.btnName = "Submit";
+      this.nextBtnState = "submit";
     }
     //console.log("this.isReportModalVis", this.isReportModalVis);
   };
@@ -529,12 +533,13 @@ export class CalendarPlanScreen extends React.Component {
     this.setState({ isReportModalVis: false });
     this.setState({ feeling: "Neutral" });
     this.setState({ isActivityCompleted: false });
-    this.setState({ isThirtyMin: false });
+    this.setState({ isOtherActivity: false });
     this.setState({ isFirstStepVis: "flex" });
     this.setState({ isSecondYesStepVis: "none" });
     this.setState({ isThirdYesStepVis: "none" });
     this.setState({ isSecondNoStepVis: "none" });
     this.setState({ isThirdNoStepVis: "none" });
+    this.setState({ isNoEventDayReportModalVis: "none" });
 
     this.setState({ nextBtnState: "next" });
     this.setState({ btnName: "Next" });
@@ -893,7 +898,7 @@ export class CalendarPlanScreen extends React.Component {
                       this.setState({ isNoEventDayReportModalVis: false });
                       // this.setState({ feeling: "Neutral" });
                       // this.setState({ isActivityCompleted: false });
-                      // this.setState({ isThirtyMin: false });
+                      // this.setState({ isOtherActivity: false });
                       // this.setState({ isFirstStepVis: "flex" });
                       // this.setState({ isSecondYesStepVis: "none" });
                       // this.setState({ isThirdYesStepVis: "none" });
@@ -951,6 +956,7 @@ export class CalendarPlanScreen extends React.Component {
                       marginBottom: "10%",
                     }}
                   >
+                    {/* //No event day report */}
                     Did you do any physical exercise today?
                   </Text>
                   <SwitchSelector
@@ -966,7 +972,14 @@ export class CalendarPlanScreen extends React.Component {
                     onPress={(value) =>
                       // console.log(`Call onPress with value: ${value}`)
                       {
-                        this.setState({ isActivityCompleted: value });
+                        this.setState({ isOtherActivity: value });
+                        if (value) {
+                          this.setState({ nextBtnState: "next" });
+                          this.setState({ btnName: "Next" });
+                        } else {
+                          this.setState({ nextBtnState: "submit" });
+                          this.setState({ btnName: "Submit" });
+                        }
                       }
                     }
                   />
@@ -986,7 +999,7 @@ export class CalendarPlanScreen extends React.Component {
                       marginBottom: "10%",
                     }}
                   >
-                    if yes, what activity and when?
+                    Tell us what physical exercise you did?
                   </Text>
                   <View
                     style={{
@@ -1010,6 +1023,7 @@ export class CalendarPlanScreen extends React.Component {
                       autoCapitalize="none"
                       autoCorrect={false}
                       value={this.state.otherActivity}
+                      maxLength={35}
                       onChangeText={(text) => {
                         this.setState({ otherActivity: text });
                       }}
@@ -1106,7 +1120,7 @@ export class CalendarPlanScreen extends React.Component {
                   disabled={this.state.isBackBtnVis}
                   onPress={() => {
                     if (this.state.nextBtnState === "submit") {
-                      if (this.state.isActivityCompleted) {
+                      if (this.state.isOtherActivity) {
                         this.setState({ isBackBtnVis: false });
                         this.setState({ isSecondYesStepVis: "flex" });
                         this.setState({ isThirdYesStepVis: "none" });
@@ -1141,29 +1155,30 @@ export class CalendarPlanScreen extends React.Component {
                   title={this.state.btnName}
                   onPress={async () => {
                     if (this.state.nextBtnState === "submit") {
-                      this.setState({ isDailyReportBtnDisabled: true });
-                      this.setState({ isNoEventDayReportModalVis: false });
-                      this.setState({ nextBtnState: "next" });
+                      // this.setState({ isDailyReportBtnDisabled: true });
+                      // this.setState({ isNoEventDayReportModalVis: false });
+                      // this.setState({ nextBtnState: "next" });
 
-                      this.setState({ feeling: "Neutral" });
-                      this.setState({ isActivityCompleted: false });
-                      this.setState({ isThirtyMin: false });
-                      this.setState({ isFirstStepVis: "flex" });
-                      this.setState({ isSecondYesStepVis: "none" });
-                      this.setState({ isSecondNoStepVis: "none" });
-                      this.setState({ isThirdNoStepVis: "none" });
-                      this.setState({ isThirdYesStepVis: "none" });
+                      // this.setState({ feeling: "Neutral" });
+                      // this.setState({ isActivityCompleted: false });
+                      // this.setState({ isOtherActivity: false });
+                      // this.setState({ isFirstStepVis: "flex" });
+                      // this.setState({ isSecondYesStepVis: "none" });
+                      // this.setState({ isSecondNoStepVis: "none" });
+                      // this.setState({ isThirdNoStepVis: "none" });
+                      // this.setState({ isThirdYesStepVis: "none" });
+                      this.resetReport();
 
                       let dailyReport = {};
                       dailyReport.isDailyReport = true;
-                      dailyReport.isExerciseToday =
-                        this.state.isActivityCompleted;
-                      if (this.state.isActivityCompleted) {
+                      dailyReport.isExerciseToday = this.state.isOtherActivity;
+                      if (this.state.isOtherActivity) {
                         dailyReport.otherActivity = this.state.otherActivity;
+                        dailyReport.feeling = this.state.feeling;
                       } else {
                         dailyReport.otherActivity = "none";
+                        dailyReport.feeling = "";
                       }
-                      dailyReport.feeling = this.state.feeling;
 
                       dailyReport.start = moment(new Date())
                         .format()
@@ -1181,7 +1196,7 @@ export class CalendarPlanScreen extends React.Component {
                       // eventToUpdate.isActivityCompleted = this.state.isActivityCompleted;
                       // eventToUpdate.isReported = true;
 
-                      // eventToUpdate.isThirtyMin = this.state.isThirtyMin;
+                      // eventToUpdate.isOtherActivity = this.state.isOtherActivity;
                       // eventToUpdate.reason = this.state.reason;
                       // eventToUpdate.otherActivity = this.state.otherActivity;
                       // eventToUpdate.feeling = this.state.feeling;
@@ -1197,15 +1212,15 @@ export class CalendarPlanScreen extends React.Component {
                       await this.dataModel.loadUserPlans(this.userKey);
                       this.userPlans = this.dataModel.getUserPlans();
                       this.setState({ feeling: "Neutral" });
-                      this.setState({ isActivityCompleted: false });
-                      this.setState({ isThirtyMin: false });
+                      //this.setState({ isOtherActivity: false });
+                      this.setState({ isOtherActivity: false });
                       this.setState({ otherActivity: "" });
                       //this.updateView();
                     } else if (this.state.nextBtnState === "next") {
                       this.setState({ isBackBtnVis: false });
                       this.setState({ isFirstStepVis: "none" });
                       this.setState({ nextBtnState: "next2" });
-                      if (this.state.isActivityCompleted) {
+                      if (this.state.isOtherActivity) {
                         //this.setState({ submitBtnState: true });
                         this.setState({ isSecondYesStepVis: "flex" });
                         //this.setState({ isButtonFirstStage: false });
@@ -1236,7 +1251,7 @@ export class CalendarPlanScreen extends React.Component {
             </View>
           </View>
         </Modal>
-        {/* eventReport */}
+        {/* Plan Report */}
         <Modal
           animationType="slide"
           transparent={true}
@@ -1385,7 +1400,7 @@ export class CalendarPlanScreen extends React.Component {
                       // console.log(`Call onPress with value: ${value}`)
 
                       {
-                        this.setState({ isThirtyMin: value });
+                        this.setState({ isOtherActivity: value });
                         console.log("SwitchSelector value", value);
                         if (value) {
                           this.setState({ btnName: "Next" });
@@ -1514,6 +1529,7 @@ export class CalendarPlanScreen extends React.Component {
                       autoCapitalize="none"
                       autoCorrect={false}
                       value={this.state.otherActivity}
+                      maxLength={35}
                       onChangeText={(text) => {
                         this.setState({ otherActivity: text });
                       }}
@@ -1531,22 +1547,22 @@ export class CalendarPlanScreen extends React.Component {
                     //   this.state.nextBtnState
 
                     // );
-                    console.log("================================");
-                    console.log("this.state.feeling", this.state.feeling);
-                    console.log(
-                      "this.state.isActivityCompleted",
-                      this.state.isActivityCompleted
-                    );
-                    console.log(
-                      "this.state.isThirtyMin",
-                      this.state.isThirtyMin
-                    );
-                    console.log("this.state.reason", this.state.reason);
-                    console.log(
-                      "this.state.otherActivity",
-                      this.state.otherActivity
-                    );
-                    console.log("================================");
+                    // console.log("================================");
+                    // console.log("this.state.feeling", this.state.feeling);
+                    // console.log(
+                    //   "this.state.isActivityCompleted",
+                    //   this.state.isActivityCompleted
+                    // );
+                    // console.log(
+                    //   "this.state.isOtherActivity",
+                    //   this.state.isOtherActivity
+                    // );
+                    // console.log("this.state.reason", this.state.reason);
+                    // console.log(
+                    //   "this.state.otherActivity",
+                    //   this.state.otherActivity
+                    // );
+                    // console.log("================================");
                     if (this.state.nextBtnState === "submit") {
                       if (this.state.isActivityCompleted) {
                         this.setState({ isBackBtnVis: true });
@@ -1555,7 +1571,7 @@ export class CalendarPlanScreen extends React.Component {
                         this.setState({ nextBtnState: "next" });
                         this.setState({ btnName: "Next" });
                       } else {
-                        if (this.state.isThirtyMin) {
+                        if (this.state.isOtherActivity) {
                           this.setState({ isBackBtnVis: false });
                           this.setState({ isThirdYesStepVis: "none" });
                           this.setState({ isThirdNoStepVis: "flex" });
@@ -1566,7 +1582,7 @@ export class CalendarPlanScreen extends React.Component {
                           this.setState({ isSecondNoStepVis: "flex" });
                           this.setState({ btnName: "Next" });
                           this.setState({ nextBtnState: "next2no" });
-                          //this.setState({ isThirtyMin: })
+                          //this.setState({ isOtherActivity: })
                         }
                       }
                     } else if (this.state.nextBtnState === "next2") {
@@ -1586,12 +1602,12 @@ export class CalendarPlanScreen extends React.Component {
                       this.setState({ isBackBtnVis: false });
                       this.setState({ isSecondNoStepVis: "flex" });
                       this.setState({ isSecondYesStepVis: "none" });
-                      this.setState({ isThirtyMin: "no records" });
+                      this.setState({ isOtherActivity: "no records" });
                     } else if (this.state.nextBtnState === "next4no") {
                       this.setState({ isThirdNoStepVis: "none" });
                       this.setState({ isSecondYesStepVis: "flex" });
                       this.setState({ nextBtnState: "next3no" });
-                      this.setState({ isThirtyMin: true });
+                      this.setState({ isOtherActivity: true });
                       //this.setState({ otherActivity: "" });
                       //this.setState({ secSwitchSelectorInitVal: 0});
                     }
@@ -1604,22 +1620,22 @@ export class CalendarPlanScreen extends React.Component {
                     //   "this.state.nextBtnState",
                     //   this.state.nextBtnState
                     // );
-                    console.log("================================");
-                    console.log("this.state.feeling", this.state.feeling);
-                    console.log(
-                      "this.state.isActivityCompleted",
-                      this.state.isActivityCompleted
-                    );
-                    console.log(
-                      "this.state.isThirtyMin",
-                      this.state.isThirtyMin
-                    );
-                    console.log("this.state.reason", this.state.reason);
-                    console.log(
-                      "this.state.otherActivity",
-                      this.state.otherActivity
-                    );
-                    console.log("================================");
+                    // console.log("================================");
+                    // console.log("this.state.feeling", this.state.feeling);
+                    // console.log(
+                    //   "this.state.isActivityCompleted",
+                    //   this.state.isActivityCompleted
+                    // );
+                    // console.log(
+                    //   "this.state.isOtherActivity",
+                    //   this.state.isOtherActivity
+                    // );
+                    // console.log("this.state.reason", this.state.reason);
+                    // console.log(
+                    //   "this.state.otherActivity",
+                    //   this.state.otherActivity
+                    // );
+                    // console.log("================================");
 
                     if (this.state.nextBtnState === "submit") {
                       // this.setState({ isReportModalVis: false });
@@ -1627,7 +1643,7 @@ export class CalendarPlanScreen extends React.Component {
 
                       // this.setState({ feeling: "Neutral" });
                       // this.setState({ isActivityCompleted: false });
-                      // this.setState({ isThirtyMin: false });
+                      // this.setState({ isOtherActivity: false });
                       // this.setState({ isFirstStepVis: "flex" });
                       // this.setState({ isSecondYesStepVis: "none" });
                       // this.setState({ isSecondNoStepVis: "none" });
@@ -1641,22 +1657,23 @@ export class CalendarPlanScreen extends React.Component {
                         this.state.isActivityCompleted;
                       eventToUpdate.isReported = true;
                       if (this.state.isActivityCompleted) {
-                        eventToUpdate.isThirtyMin = "";
+                        eventToUpdate.isOtherActivity = "";
                         eventToUpdate.reason = "";
                       } else {
-                        eventToUpdate.isThirtyMin = this.state.isThirtyMin;
+                        eventToUpdate.isOtherActivity =
+                          this.state.isOtherActivity;
                         eventToUpdate.reason = this.state.reason;
-                        if (this.state.isThirtyMin) {
-                          eventToUpdate.otherActivity = ""
+                        if (this.state.isOtherActivity) {
+                          eventToUpdate.otherActivity =
+                            this.state.otherActivity;
                         } else {
-                          eventToUpdate.otherActivity = this.state.otherActivity;
+                          eventToUpdate.otherActivity = "";
                         }
                       }
-                      
-                      
+
                       if (
                         !this.state.isActivityCompleted &&
-                        !this.state.isThirtyMin
+                        !this.state.isOtherActivity
                       ) {
                         eventToUpdate.feeling = "";
                       } else {
@@ -1673,7 +1690,7 @@ export class CalendarPlanScreen extends React.Component {
                       await this.dataModel.loadUserPlans(this.userKey);
                       this.setState({ feeling: "Neutral" });
                       this.setState({ isActivityCompleted: false });
-                      this.setState({ isThirtyMin: false });
+                      this.setState({ isOtherActivity: false });
                       this.userPlans = this.dataModel.getUserPlans();
                       //this.updateView();
 
@@ -1725,7 +1742,7 @@ export class CalendarPlanScreen extends React.Component {
                       // this.setState({ isSecondYesStepVis: "none" });
                       // this.setState({ isThirdYesStepVis: "flex" });
                       // this.setState({ isThirdNoStepVis: "none" });
-                      if (this.state.isThirtyMin) {
+                      if (this.state.isOtherActivity) {
                         this.setState({ isThirdNoStepVis: "flex" });
                         this.setState({ btnName: "Next" });
                         this.setState({ nextBtnState: "next4no" });
@@ -1739,7 +1756,7 @@ export class CalendarPlanScreen extends React.Component {
                       this.setState({ nextBtnState: "next3no" });
                       this.setState({ isSecondNoStepVis: "none" });
                       this.setState({ isSecondYesStepVis: "flex" });
-                      if (!this.state.isThirtyMin) {
+                      if (!this.state.isOtherActivity) {
                         this.setState({ isThirdNoStepVis: "none" });
                         this.setState({ btnName: "Submit" });
                         this.setState({ nextBtnState: "submit" });
@@ -2148,7 +2165,7 @@ export class CalendarPlanScreen extends React.Component {
                 <View
                   style={{
                     flex: 0.5,
-                    marginRight:5,
+                    marginRight: 5,
                     flexDirection: "column",
                     height: "100%",
                     justifyContent: "space-between",
@@ -2299,7 +2316,7 @@ export class CalendarPlanScreen extends React.Component {
                     flexDirection: "column",
                     height: "100%",
                     justifyContent: "space-between",
-                    marginLeft:5,
+                    marginLeft: 5,
                   }}
                 >
                   <View style={{ flex: 0.5, justifyContent: "center" }}>
@@ -2333,6 +2350,7 @@ export class CalendarPlanScreen extends React.Component {
                       style={{ fontSize: 16, marginLeft: 10 }}
                       placeholder="add new activity"
                       value={this.state.userDefinedActivityText}
+                      maxLength={35}
                       onChangeText={(text) =>
                         this.setState({ userDefinedActivityText: text })
                       }
