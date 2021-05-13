@@ -1156,7 +1156,7 @@ export class CalendarPlanScreen extends React.Component {
                   onPress={async () => {
                     if (this.state.nextBtnState === "submit") {
                       // this.setState({ isDailyReportBtnDisabled: true });
-                      // this.setState({ isNoEventDayReportModalVis: false });
+                      this.setState({ isNoEventDayReportModalVis: false });
                       // this.setState({ nextBtnState: "next" });
 
                       // this.setState({ feeling: "Neutral" });
@@ -2360,6 +2360,20 @@ export class CalendarPlanScreen extends React.Component {
                         onPress={async () => {
                           let activityList = this.state.activityData;
                           // console.log("activityList",activityList);
+                          if (this.state.userDefinedActivityText === "") {
+                              Alert.alert(
+                                
+                                  "Invalid Name",
+                                "Activity name can't be empty",
+                                [
+                                  {
+                                    text: "OK",
+                                    onPress: () => console.log("OK Pressed"),
+                                  },
+                                ]
+                              );
+                              return;
+                          }
                           this.index++;
                           let newActivity = {
                             key: this.index,

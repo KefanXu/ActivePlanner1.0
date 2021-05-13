@@ -1,3 +1,4 @@
+// This is the first version of Physicify that will be used in the first phase study
 import React from "react";
 import {
   TextInput,
