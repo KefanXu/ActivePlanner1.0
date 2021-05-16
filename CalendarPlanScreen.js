@@ -316,6 +316,33 @@ export class CalendarPlanScreen extends React.Component {
   //   }
   //   // return eventToday;
   // };
+
+  componentDidMount = async () => {
+    this.dataModel = getDataModel();
+    await this.dataModel.asyncInit();
+    this.focusUnsubscribe = this.props.navigation.addListener(
+      "focus",
+      this.onFocus
+    );
+    //
+  };
+  onFocus = async () => {
+    console.log("on Focus");
+    this.dataModel = getDataModel();
+    await this.dataModel.asyncInit();
+
+    await this.dataModel.loadUserPlans(this.userKey);
+    this.userPlans = this.dataModel.getUserPlans();
+    
+    this.reportPopUp(this.userPlans);
+    if (this.isNoEventDayReportModalVis) {
+      this.setState({isNoEventDayReportModalVis: true});
+      this.setState({ btnName: "Submit"});
+      this.setState({ nextBtnState: "submit"});
+
+    }
+  };
+
   reportPopUp = (userPlanList) => {
     let currentDate = moment(new Date()).format().slice(0, 10);
     //console.log("userPlanList", userPlanList);
@@ -325,8 +352,9 @@ export class CalendarPlanScreen extends React.Component {
         let eventDate = event.end.slice(0, 10);
         //console.log("eventDate", eventDate);
         if (eventDate === currentDate) {
-          console.log("isNoEventToday", isNoEventToday);
+          
           isNoEventToday = false;
+          console.log("isNoEventToday", isNoEventToday);
         }
         //let eventDate = event.end.slice(0, 10);
         //console.log(eventDate);
@@ -345,11 +373,15 @@ export class CalendarPlanScreen extends React.Component {
         //console.log(this.isPlannedToday);
       }
     }
+    console.log("isNoEventToday", isNoEventToday);
+    
     if (isNoEventToday) {
       this.isNoEventDayReportModalVis = true;
       this.isDailyReportBtnDisabled = false;
       this.btnName = "Submit";
       this.nextBtnState = "submit";
+    } else {
+      this.isNoEventDayReportModalVis = false;
     }
     //console.log("this.isReportModalVis", this.isReportModalVis);
   };
@@ -1182,7 +1214,7 @@ export class CalendarPlanScreen extends React.Component {
 
                       dailyReport.start = moment(new Date())
                         .format()
-                        .slice(0, 19);
+                        .slice(0, 10);
                       dailyReport.end = dailyReport.start;
 
                       let timeStamp = moment(new Date()).format();
@@ -1816,21 +1848,28 @@ export class CalendarPlanScreen extends React.Component {
                 style={{
                   backgroundColor: "black",
                   color: "white",
-                  width: 60,
+                  width: 100,
                   height: 25,
                   borderRadius: 30,
                   justifyContent: "center",
                   alignItems: "center",
                 }}
-                disabled={this.state.isDailyReportBtnDisabled}
-                onPress={() =>
-                  this.setState({ isNoEventDayReportModalVis: true })
+                // disabled={this.state.isDailyReportBtnDisabled}
+                disabled={false}
+                onPress={
+                  () => {
+                    this.props.navigation.navigate("ReportCollection", {
+                      userKey: this.userKey,
+                      userPlans: this.userPlans,
+                    });
+                  }
+                  // this.setState({ isNoEventDayReportModalVis: true })
                 }
               >
                 <Text
-                  style={{ color: "white", fontWeight: "bold", fontSize: 15 }}
+                  style={{ color: "white", fontWeight: "bold", fontSize: 8 }}
                 >
-                  Report
+                  Unfinished Reports
                 </Text>
               </TouchableOpacity>
             </View>
@@ -2006,6 +2045,7 @@ export class CalendarPlanScreen extends React.Component {
                           disabled={false}
                           onPress={async () => {
                             console.log("delete item", item);
+                            await this.dataModel.deleteReminders(item);
                             item.isDeleted = true;
                             if (
                               item.timeStamp.slice(0, 10) ===
@@ -2361,18 +2401,17 @@ export class CalendarPlanScreen extends React.Component {
                           let activityList = this.state.activityData;
                           // console.log("activityList",activityList);
                           if (this.state.userDefinedActivityText === "") {
-                              Alert.alert(
-                                
-                                  "Invalid Name",
-                                "Activity name can't be empty",
-                                [
-                                  {
-                                    text: "OK",
-                                    onPress: () => console.log("OK Pressed"),
-                                  },
-                                ]
-                              );
-                              return;
+                            Alert.alert(
+                              "Invalid Name",
+                              "Activity name can't be empty",
+                              [
+                                {
+                                  text: "OK",
+                                  onPress: () => console.log("OK Pressed"),
+                                },
+                              ]
+                            );
+                            return;
                           }
                           this.index++;
                           let newActivity = {

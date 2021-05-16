@@ -27,7 +27,7 @@ export class LoginScreen extends React.Component {
       imageURI: "http://openweathermap.org/img/w/unknown.png",
     };
   }
-  componentDidMount = async() => {
+  componentDidMount = async () => {
     this.dataModel = getDataModel();
     await this.dataModel.asyncInit();
     this.focusUnsubscribe = this.props.navigation.addListener(
@@ -35,7 +35,6 @@ export class LoginScreen extends React.Component {
       this.onFocus
     );
     //
-    
   };
   onFocus = async () => {
     console.log("on Focus");
@@ -187,12 +186,8 @@ export class LoginScreen extends React.Component {
       timeMax
     );
     //console.log("calEvents",calEvents);
-    let [
-      previousMonthList,
-      thisMonthList,
-      nextMonthList,
-      fullEventList,
-    ] = this.processCalEvent(calEvents.items);
+    let [previousMonthList, thisMonthList, nextMonthList, fullEventList] =
+      this.processCalEvent(calEvents.items);
     let key;
     let isUserFound = false;
     console.log("calendarsID", calendarsID);
@@ -206,11 +201,15 @@ export class LoginScreen extends React.Component {
     if (!isUserFound) {
       await this.dataModel.createNewUser(calendarsID);
       key = this.dataModel.getUserKey();
+      await this.dataModel.createDailyNotifications();
+      
     }
+    
     // console.log(previousMonthList);
     // console.log(thisMonthList);
     // console.log(nextMonthList);
-    let userDefineActivitiesNotExist = await this.dataModel.isUserDefineActivitiesExist(key)
+    let userDefineActivitiesNotExist =
+      await this.dataModel.isUserDefineActivitiesExist(key);
     if (userDefineActivitiesNotExist) {
       await this.dataModel.createUserActivities(key);
     }
@@ -286,9 +285,13 @@ export class LoginScreen extends React.Component {
 
     for (let dayEvent of eventList) {
       //console.log("dayEvent.start ",dayEvent.start);
-
+      let timeStamp;
       if (dayEvent.start) {
-        let timeStamp = dayEvent.start.dateTime.slice(0, 7);
+        if (dayEvent.start.dateTime) {
+          timeStamp = dayEvent.start.dateTime.slice(0, 7);
+        } else {
+          timeStamp = dayEvent.start.date.slice(0, 7);
+        }
         //console.log("typeof(dayEvent.start.dateTime)",typeof(dayEvent.start.dateTime));
         let simplifiedEvent = {
           start: dayEvent.start.dateTime,

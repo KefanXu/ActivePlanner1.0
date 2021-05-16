@@ -5,6 +5,7 @@ import { firebaseConfig } from "./Secret";
 
 import * as Notification from "expo-notifications";
 import * as Google from "expo-google-app-auth";
+import moment, { min } from "moment";
 
 const config = {
   // clientId:
@@ -84,13 +85,13 @@ class DataModel {
     console.log("loadUserPlans");
   };
   getUserPlans = () => {
-    for (let event of this.plans) {
-      if (event.start) {
-        if (event.start.slice(0, 10) === "2021-05-07") {
-          console.log("getUserPlans", event);
-        }
-      }
-    }
+    // for (let event of this.plans) {
+    //   if (event.start) {
+    //     if (event.start.slice(0, 10) === "2021-05-07") {
+    //       console.log("getUserPlans", event);
+    //     }
+    //   }
+    // }
 
     return this.plans;
   };
@@ -242,8 +243,8 @@ class DataModel {
     //console.log("reportTrigger", reportTrigger);
     let identifier = await Notification.scheduleNotificationAsync({
       content: {
-        title: "Upcoming Physical Activity2",
-        body: " is about to happen in an hour",
+        title: "Take some time to report your activity",
+        body: "What is your experience with " + newEvent.title,
         data: { data: "goes here" },
       },
       trigger,
@@ -251,6 +252,23 @@ class DataModel {
     console.log("identifier2", identifier);
     return identifier;
   };
+  createDailyNotifications = async() => {
+    let startDate = new Date();
+    for (let i = 0; i <= 14; i++) {
+      let nextDate = startDate.setDate(startDate.getDate() + 1);
+      let trigger = new Date(Date.parse(moment(nextDate).format().slice(0,11) + "20:00:00"));
+      await Notification.scheduleNotificationAsync({
+      content: {
+        title: "How's everything goes",
+        body: "Take some time to report you day!",
+        data: { data: "goes here" },
+      },
+      trigger,
+    });
+    }
+      console.log("createDailyNotifications");
+
+  }
   cancelNotification = async () => {};
   googleServiceInit = async (timeMin, timeMax) => {
     const { type, accessToken, user } = await Google.logInAsync(config);
