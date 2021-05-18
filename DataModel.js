@@ -259,7 +259,7 @@ class DataModel {
       let trigger = new Date(Date.parse(moment(nextDate).format().slice(0,11) + "20:00:00"));
       await Notification.scheduleNotificationAsync({
       content: {
-        title: "How's everything goes",
+        title: "How's everything going",
         body: "Take some time to report you day!",
         data: { data: "goes here" },
       },
