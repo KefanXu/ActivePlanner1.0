@@ -55,7 +55,10 @@ export class ReportCollection extends React.Component {
       let isReportExist = false;
       for (let event of this.userPlans) {
         if (event.start) {
-          if (event.start.slice(0, 10) === date.slice(0, 10) && !event.isDeleted) {
+          if (
+            event.start.slice(0, 10) === date.slice(0, 10) &&
+            !event.isDeleted
+          ) {
             isReportExist = true;
           }
         }
@@ -156,8 +159,10 @@ export class ReportCollection extends React.Component {
                       this.setState({ isThirdYesStepVis: "none" });
                       this.setState({ isSecondNoStepVis: "none" });
                       this.setState({ isThirdNoStepVis: "none" });
-                      this.setState({ nextBtnState: "next" });
+                      this.setState({ nextBtnState: "submit" });
                       this.setState({ otherActivity: "" });
+                      this.setState({ isBackBtnVis: true });
+                      this.setState({ btnName: "Submit" });
 
                       //this.resetReport();
                     }}
@@ -409,7 +414,9 @@ export class ReportCollection extends React.Component {
                     if (this.state.nextBtnState === "submit") {
                       this.setState({ isDailyReportBtnDisabled: true });
                       this.setState({ isNoEventDayReportModalVis: false });
-                      this.setState({ nextBtnState: "next" });
+                      this.setState({ nextBtnState: "submit" });
+                      this.setState({ isBackBtnVis: true });
+                      this.setState({ btnName: "Submit" });
 
                       this.setState({ feeling: "Neutral" });
                       this.setState({ isActivityCompleted: false });
@@ -512,7 +519,16 @@ export class ReportCollection extends React.Component {
             </View>
           </View>
         </Modal>
-        <Text style={{ fontSize: 25, fontWeight: "bold", marginTop:100, marginLeft:40 }}>Unfinished Reports</Text>
+        <Text
+          style={{
+            fontSize: 25,
+            fontWeight: "bold",
+            marginTop: 100,
+            marginLeft: 40,
+          }}
+        >
+          Unfinished Reports
+        </Text>
         <FlatList
           data={this.preList}
           contentContainerStyle={{

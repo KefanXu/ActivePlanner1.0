@@ -2387,15 +2387,15 @@ export class CalendarPlanScreen extends React.Component {
                     }}
                   >
                     <TextInput
-                      style={{ fontSize: 16, marginLeft: 10 }}
-                      placeholder="add new activity"
+                      style={{ flex:0.8, fontSize: 16, marginLeft: 10 }}
+                      placeholder="new activity"
                       value={this.state.userDefinedActivityText}
                       maxLength={35}
                       onChangeText={(text) =>
                         this.setState({ userDefinedActivityText: text })
                       }
                     ></TextInput>
-                    <View>
+                    <View style={{flex:0.2,alignItems:"flex-end"}}>
                       <TouchableOpacity
                         onPress={async () => {
                           let activityList = this.state.activityData;
