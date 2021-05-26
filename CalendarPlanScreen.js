@@ -1077,7 +1077,7 @@ export class CalendarPlanScreen extends React.Component {
                       marginBottom: "10%",
                     }}
                   >
-                    How satisfied are you with today's activity?
+                    How do you feel about {this.state.otherActivity} today?
                   </Text>
                   <SwitchSelector
                     options={[
@@ -1458,7 +1458,7 @@ export class CalendarPlanScreen extends React.Component {
                       marginTop: "20%",
                     }}
                   >
-                    How satisfied are you with today's activity?
+                    How do you feel about {this.eventToday.title} on {this.eventToday.start.slice(5, 10)}?
                   </Text>
                   <SwitchSelector
                     options={[

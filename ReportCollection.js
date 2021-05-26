@@ -302,7 +302,7 @@ export class ReportCollection extends React.Component {
                       marginBottom: "10%",
                     }}
                   >
-                    How satisfied are you with today's activity?
+                    How do you feel about {this.state.otherActivity} on {this.state.reportDate}?
                   </Text>
                   <SwitchSelector
                     options={[
