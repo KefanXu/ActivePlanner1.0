@@ -100,6 +100,8 @@ export class CalendarPlanScreen extends React.Component {
     this.pastPlans = [];
     this.futurePlans = [];
     this.planToday = [];
+    this.preList;
+    this.preListLength;
 
     let todayDate = new Date();
     for (let event of this.userPlans) {
@@ -202,6 +204,7 @@ export class CalendarPlanScreen extends React.Component {
     this.btnName = "Next";
     this.nextBtnState = "next";
     this.reportPopUp(this.userPlans);
+    this.getUnfinishedReport();
     this.state = {
       isMonthCalVis: true,
       date: new Date(),
@@ -282,6 +285,8 @@ export class CalendarPlanScreen extends React.Component {
       isDailyReportBtnDisabled: this.isDailyReportBtnDisabled,
 
       secSwitchSelectorInitVal: 0,
+      preList: this.preList,
+      preListLength: this.preListLength,
     };
     //console.log("weatherThisMonth",this.state.weatherThisMonth);
     // this.monthCalRef = React.createRef();
@@ -333,13 +338,67 @@ export class CalendarPlanScreen extends React.Component {
 
     await this.dataModel.loadUserPlans(this.userKey);
     this.userPlans = this.dataModel.getUserPlans();
-    
-    this.reportPopUp(this.userPlans);
-    if (this.isNoEventDayReportModalVis) {
-      this.setState({isNoEventDayReportModalVis: true});
-      this.setState({ btnName: "Submit"});
-      this.setState({ nextBtnState: "submit"});
 
+    this.reportPopUp(this.userPlans);
+    this.getUnfinishedReport();
+    if (this.isNoEventDayReportModalVis) {
+      this.setState({ isNoEventDayReportModalVis: true });
+      this.setState({ btnName: "Submit" });
+      this.setState({ nextBtnState: "submit" });
+    }
+  };
+  getUnfinishedReport = () => {
+    let preList = [];
+    let todayDate = new Date();
+    let dailyReport = {};
+    //this.dataModel = getDataModel();
+    dailyReport.start = moment(todayDate).format().slice(0, 10);
+    dailyReport.end = dailyReport.start;
+    dailyReport.key = dailyReport.start;
+    dailyReport.title = "Daily Report";
+    let isReportExist = false;
+    for (let event of this.userPlans) {
+      if (event.start && !event.isDeleted) {
+        if (event.start.slice(0, 10) === dailyReport.start.slice(0, 10)) {
+          isReportExist = true;
+        }
+      }
+    }
+    if (!isReportExist) {
+      //report.date = date;
+      preList.push(dailyReport);
+    }
+
+    //this.preList.push(dailyReport);
+    for (i = 1; i < 5; i++) {
+      let preDate = todayDate.setDate(todayDate.getDate() - 1);
+      let report = {};
+      let date = moment(preDate).format().slice(0, 10);
+      let isReportExist = false;
+      for (let event of this.userPlans) {
+        if (event.start) {
+          if (
+            event.start.slice(0, 10) === date.slice(0, 10) &&
+            !event.isDeleted
+          ) {
+            isReportExist = true;
+          }
+        }
+      }
+      if (!isReportExist) {
+        report.title = "Daily Report";
+        report.start = date;
+        report.end = report.start;
+        report.key = report.start;
+        preList.push(report);
+      }
+    }
+    if (this.preList) {
+      this.setState({ preList: preList });
+      this.setState({ preListLength: preList.length });
+    } else {
+      this.preList = preList;
+      this.preListLength = preList.length;
     }
   };
 
@@ -352,7 +411,6 @@ export class CalendarPlanScreen extends React.Component {
         let eventDate = event.end.slice(0, 10);
         //console.log("eventDate", eventDate);
         if (eventDate === currentDate) {
-          
           isNoEventToday = false;
           console.log("isNoEventToday", isNoEventToday);
         }
@@ -374,7 +432,7 @@ export class CalendarPlanScreen extends React.Component {
       }
     }
     console.log("isNoEventToday", isNoEventToday);
-    
+
     if (isNoEventToday) {
       this.isNoEventDayReportModalVis = true;
       this.isDailyReportBtnDisabled = false;
@@ -588,8 +646,8 @@ export class CalendarPlanScreen extends React.Component {
   onPlanBtnPressed = async () => {
     if (this.state.isPlannedToday) {
       Alert.alert(
-        "You already planned today",
-        "You could delete the planned activity on " +
+        "You already have a plan",
+        "To create a new activity, you could delete the planned activity on " +
           this.state.isPlannedDate +
           " and start a new one",
         [{ text: "OK", onPress: () => console.log("OK Pressed") }]
@@ -870,7 +928,7 @@ export class CalendarPlanScreen extends React.Component {
     } else {
       planTodayView = (
         <Text style={{ fontSize: 16, fontWeight: "bold" }}>
-          No Activity Planned for today
+          No activity planned for today
         </Text>
       );
     }
@@ -928,17 +986,6 @@ export class CalendarPlanScreen extends React.Component {
                   <TouchableOpacity
                     onPress={() => {
                       this.setState({ isNoEventDayReportModalVis: false });
-                      // this.setState({ feeling: "Neutral" });
-                      // this.setState({ isActivityCompleted: false });
-                      // this.setState({ isOtherActivity: false });
-                      // this.setState({ isFirstStepVis: "flex" });
-                      // this.setState({ isSecondYesStepVis: "none" });
-                      // this.setState({ isThirdYesStepVis: "none" });
-                      // this.setState({ isSecondNoStepVis: "none" });
-                      // this.setState({ isThirdNoStepVis: "none" });
-                      // this.setState({ nextBtnState: "next" });
-                      // this.setState({ otherActivity: "" });
-
                       this.resetReport();
                     }}
                   >
@@ -955,7 +1002,7 @@ export class CalendarPlanScreen extends React.Component {
                 }}
               >
                 <Text style={{ fontSize: 24, fontWeight: "bold" }}>
-                  Tell us about your day!
+                  Daily Report
                 </Text>
                 <Text
                   style={{ fontSize: 14, fontWeight: "bold", marginTop: 5 }}
@@ -1077,13 +1124,13 @@ export class CalendarPlanScreen extends React.Component {
                       marginBottom: "10%",
                     }}
                   >
-                    How do you feel about {this.state.otherActivity} today?
+                    How satisfied are you with what you've experienced as a result of {this.state.otherActivity} today?
                   </Text>
                   <SwitchSelector
                     options={[
-                      { label: "😕 Negative", value: "Negative" },
-                      { label: "😑 Neutral", value: "Neutral" },
-                      { label: "🙂 Positive", value: "Positive" },
+                      { label: "Unsatisfied", value: "Unsatisfied" },
+                      { label: "Neutral", value: "Neutral" },
+                      { label: "Satisfied", value: "Satisfied" },
                     ]}
                     initial={1}
                     buttonMargin={1}
@@ -1187,18 +1234,7 @@ export class CalendarPlanScreen extends React.Component {
                   title={this.state.btnName}
                   onPress={async () => {
                     if (this.state.nextBtnState === "submit") {
-                      // this.setState({ isDailyReportBtnDisabled: true });
                       this.setState({ isNoEventDayReportModalVis: false });
-                      // this.setState({ nextBtnState: "next" });
-
-                      // this.setState({ feeling: "Neutral" });
-                      // this.setState({ isActivityCompleted: false });
-                      // this.setState({ isOtherActivity: false });
-                      // this.setState({ isFirstStepVis: "flex" });
-                      // this.setState({ isSecondYesStepVis: "none" });
-                      // this.setState({ isSecondNoStepVis: "none" });
-                      // this.setState({ isThirdNoStepVis: "none" });
-                      // this.setState({ isThirdYesStepVis: "none" });
                       this.resetReport();
 
                       let dailyReport = {};
@@ -1348,7 +1384,7 @@ export class CalendarPlanScreen extends React.Component {
                 }}
               >
                 <Text style={{ fontSize: 24, fontWeight: "bold" }}>
-                  Tell us about your day!
+                  Physical Exercise Report
                 </Text>
                 <Text
                   style={{ fontSize: 14, fontWeight: "bold", marginTop: 5 }}
@@ -1383,7 +1419,7 @@ export class CalendarPlanScreen extends React.Component {
                     You planned {this.eventToday.title} on{" "}
                     {this.eventToday.start.slice(5, 10)} at{" "}
                     {this.eventToday.start.slice(11, 16)} for 30 min, did you
-                    followed your plan?
+                    follow your plan?
                   </Text>
                   <SwitchSelector
                     options={[
@@ -1458,13 +1494,21 @@ export class CalendarPlanScreen extends React.Component {
                       marginTop: "20%",
                     }}
                   >
-                    How do you feel about {this.eventToday.title} on {this.eventToday.start.slice(5, 10)}?
+                    {this.state.isActivityCompleted
+                      ? "How satisfied are you with what you've experienced as a result of " +
+                        this.eventToday.title +
+                        " on " +
+                        this.eventToday.start.slice(5, 10) +
+                        "?"
+                      : "How satisfied are you with what you've experienced as a result of " +
+                        this.state.otherActivity +
+                        "?"}
                   </Text>
                   <SwitchSelector
                     options={[
-                      { label: "😕 Negative", value: "Negative" },
-                      { label: "😑 Neutral", value: "Neutral" },
-                      { label: "🙂 Positive", value: "Positive" },
+                      { label: "Unsatisfied", value: "Unsatisfied" },
+                      { label: "Neutral", value: "Neutral" },
+                      { label: "Satisfied", value: "Satisfied" },
                     ]}
                     initial={1}
                     buttonMargin={1}
@@ -1537,7 +1581,7 @@ export class CalendarPlanScreen extends React.Component {
                       marginTop: "20%",
                     }}
                   >
-                    Did you do any other activities?
+                    Tell us what physical exercise you did?
                   </Text>
                   <View
                     style={{
@@ -1670,17 +1714,6 @@ export class CalendarPlanScreen extends React.Component {
                     // console.log("================================");
 
                     if (this.state.nextBtnState === "submit") {
-                      // this.setState({ isReportModalVis: false });
-                      // this.setState({ nextBtnState: "next" });
-
-                      // this.setState({ feeling: "Neutral" });
-                      // this.setState({ isActivityCompleted: false });
-                      // this.setState({ isOtherActivity: false });
-                      // this.setState({ isFirstStepVis: "flex" });
-                      // this.setState({ isSecondYesStepVis: "none" });
-                      // this.setState({ isSecondNoStepVis: "none" });
-                      // this.setState({ isThirdNoStepVis: "none" });
-                      // this.setState({ isThirdYesStepVis: "none" });
 
                       this.resetReport();
 
@@ -1828,28 +1861,23 @@ export class CalendarPlanScreen extends React.Component {
               height: "100%",
               justifyContent: "space-between",
               alignItems: "center",
+              
             }}
           >
-            <View
-              style={{
-                marginTop: "5%",
-                flex: 0.1,
-                width: "75%",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                //backgroundColor:"red"
-              }}
-            >
-              <Text style={{ fontSize: 25, fontWeight: "bold" }}>
-                Activity Today
-              </Text>
+            <View style={{ flex: 0.1,width:"75%",flexDirection: "row",justifyContent:"space-between", alignItems:"center", backgroundColor:"white", borderRadius:20}}>
+              <View style={{flex:0.6,marginLeft: 10}}>
+                <Text style={{fontWeight:"bold"}}>
+                  You have <Text style={{color:"red"}}>{this.state.preListLength} </Text>unfinished daily reports
+                </Text>
+              </View>
               <TouchableOpacity
                 style={{
                   backgroundColor: "black",
                   color: "white",
-                  width: 100,
+                  flex:0.4,
                   height: 25,
+                  marginRight:5,
+                  marginLeft:5,
                   borderRadius: 30,
                   justifyContent: "center",
                   alignItems: "center",
@@ -1867,11 +1895,26 @@ export class CalendarPlanScreen extends React.Component {
                 }
               >
                 <Text
-                  style={{ color: "white", fontWeight: "bold", fontSize: 8 }}
+                  style={{ color: "white", fontWeight: "bold", fontSize: 10 }}
                 >
-                  Unfinished Reports
+                  Complete
                 </Text>
               </TouchableOpacity>
+            </View>
+            <View
+              style={{
+                marginTop: "5%",
+                flex: 0.1,
+                width: "75%",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                //backgroundColor:"red"
+              }}
+            >
+              <Text style={{ fontSize: 25, fontWeight: "bold" }}>
+                Activity Today
+              </Text>
             </View>
             <View style={{ flex: 0.1 }}>{planTodayView}</View>
 
@@ -2387,7 +2430,7 @@ export class CalendarPlanScreen extends React.Component {
                     }}
                   >
                     <TextInput
-                      style={{ flex:0.8, fontSize: 16, marginLeft: 10 }}
+                      style={{ flex: 0.8, fontSize: 16, marginLeft: 10 }}
                       placeholder="new activity"
                       value={this.state.userDefinedActivityText}
                       maxLength={35}
@@ -2395,7 +2438,7 @@ export class CalendarPlanScreen extends React.Component {
                         this.setState({ userDefinedActivityText: text })
                       }
                     ></TextInput>
-                    <View style={{flex:0.2,alignItems:"flex-end"}}>
+                    <View style={{ flex: 0.2, alignItems: "flex-end" }}>
                       <TouchableOpacity
                         onPress={async () => {
                           let activityList = this.state.activityData;

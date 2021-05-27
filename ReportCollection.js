@@ -180,7 +180,7 @@ export class ReportCollection extends React.Component {
                 }}
               >
                 <Text style={{ fontSize: 24, fontWeight: "bold" }}>
-                  Tell us about your day!
+                  Daily Report
                 </Text>
                 <Text
                   style={{ fontSize: 14, fontWeight: "bold", marginTop: 5 }}
@@ -302,13 +302,13 @@ export class ReportCollection extends React.Component {
                       marginBottom: "10%",
                     }}
                   >
-                    How do you feel about {this.state.otherActivity} on {this.state.reportDate}?
+                    How satisfied are you with what you've experienced as a result of {this.state.otherActivity} on {this.state.reportDate}?
                   </Text>
                   <SwitchSelector
                     options={[
-                      { label: "😕 Negative", value: "Negative" },
-                      { label: "😑 Neutral", value: "Neutral" },
-                      { label: "🙂 Positive", value: "Positive" },
+                      { label: "Unsatisfied", value: "Unsatisfied" },
+                      { label: "Neutral", value: "Neutral" },
+                      { label: "Satisfied", value: "Satisfied" },
                     ]}
                     initial={1}
                     buttonMargin={1}
