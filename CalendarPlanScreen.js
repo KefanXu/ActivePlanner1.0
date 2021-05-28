@@ -1865,7 +1865,7 @@ export class CalendarPlanScreen extends React.Component {
               
             }}
           >
-            <View style={{ flex: 0.1,width:"75%",flexDirection: "row",justifyContent:"space-between", alignItems:"center", backgroundColor:"white", borderRadius:20}}>
+            <View style={{ flex: 0.1,width:"75%",flexDirection: "row",justifyContent:"space-between", alignItems:"center", backgroundColor:"white", borderRadius:20, borderColor:"black", borderWidth:1}}>
               <View style={{flex:0.6,marginLeft: 10}}>
                 <Text style={{fontWeight:"bold"}}>
                   You have <Text style={{color:"red"}}>{this.state.preListLength} </Text>unfinished daily reports
