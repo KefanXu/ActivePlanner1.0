@@ -1284,6 +1284,7 @@ export class CalendarPlanScreen extends React.Component {
                       this.setState({ isOtherActivity: false });
                       this.setState({ otherActivity: "" });
                       //this.updateView();
+                      this.getUnfinishedReport();
                     } else if (this.state.nextBtnState === "next") {
                       this.setState({ isBackBtnVis: false });
                       this.setState({ isFirstStepVis: "none" });

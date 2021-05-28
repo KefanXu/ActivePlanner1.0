@@ -22,7 +22,7 @@
       "buildNumber": "1.0.3",
       "config":{
         "googleSignIn":{
-          "reservedClientId":"com.googleusercontent.apps.858218224278-5k545fdqrtnhevp0lefpl7ht1ebf3gap",
+          "reservedClientId":"com.googleusercontent.apps.858218224278-5k545fdqrtnhevp0lefpl7ht1ebf3gap"
         }
       }
     },
