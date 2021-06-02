@@ -11,7 +11,7 @@ const config = {
   // clientId:
   //   "858218224278-2rdlmrgknnj1m8m7hourt0r59iuiiagm.apps.googleusercontent.com",
   iosStandaloneAppClientId:
-    "858218224278-5k545fdqrtnhevp0lefpl7ht1ebf3gap.apps.googleusercontent.com",
+    "858218224278-0n6of0mo5fae21umkd05baubcgqigsou.apps.googleusercontent.com",
   iosClientId:
     "858218224278-nsuhfmntn6alt59c74sl312i5od457dm.apps.googleusercontent.com",
   scopes: [
@@ -40,6 +40,7 @@ class DataModel {
     this.key = "";
     this.asyncInit();
     // init function -> create new datamodel / reset data to initial state
+    
     console.log("Data Model created");
   }
 
@@ -48,6 +49,7 @@ class DataModel {
     this.users = [];
     this.plans = [];
     this.key = "";
+    await this.askPermission();
     await this.loadUsers();
     //console.log("this.users", this.users);
   };
