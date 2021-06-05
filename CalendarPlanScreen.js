@@ -370,7 +370,7 @@ export class CalendarPlanScreen extends React.Component {
     }
 
     //this.preList.push(dailyReport);
-    for (i = 1; i < 5; i++) {
+    for (let i = 1; i < 5; i++) {
       let preDate = todayDate.setDate(todayDate.getDate() - 1);
       let report = {};
       let date = moment(preDate).format().slice(0, 10);
@@ -1124,7 +1124,8 @@ export class CalendarPlanScreen extends React.Component {
                       marginBottom: "10%",
                     }}
                   >
-                    How satisfied are you with what you've experienced as a result of {this.state.otherActivity} today?
+                    How satisfied are you with what you've experienced as a
+                    result of {this.state.otherActivity} today?
                   </Text>
                   <SwitchSelector
                     options={[
@@ -1303,11 +1304,24 @@ export class CalendarPlanScreen extends React.Component {
                       this.state.nextBtnState === "next2" ||
                       this.state.nextBtnState === "next3no"
                     ) {
-                      this.setState({ btnName: "Submit" });
-                      this.setState({ nextBtnState: "submit" });
-                      this.setState({ isSecondYesStepVis: "none" });
-                      this.setState({ isThirdYesStepVis: "flex" });
-                      this.setState({ isThirdNoStepVis: "none" });
+                      if (this.state.otherActivity === "") {
+                        Alert.alert(
+                          "Invalid Name",
+                          "The field can't be empty",
+                          [
+                            {
+                              text: "OK",
+                              onPress: () => console.log("OK Pressed"),
+                            },
+                          ]
+                        );
+                      } else {
+                        this.setState({ btnName: "Submit" });
+                        this.setState({ nextBtnState: "submit" });
+                        this.setState({ isSecondYesStepVis: "none" });
+                        this.setState({ isThirdYesStepVis: "flex" });
+                        this.setState({ isThirdNoStepVis: "none" });
+                      }
                     } else if (this.state.nextBtnState === "next2no") {
                       this.setState({ btnName: "next" });
                       this.setState({ nextBtnState: "next3no" });
@@ -1419,8 +1433,9 @@ export class CalendarPlanScreen extends React.Component {
                   >
                     You planned {this.eventToday.title} on{" "}
                     {this.eventToday.start.slice(5, 10)} at{" "}
-                    {this.eventToday.start.slice(11, 16)} for 30 min, did you
-                    follow your plan?
+                    {this.eventToday.start.slice(11, 16)}, did you follow you plan?
+                    {"\n"}
+                    (also answer "yes" if you did it at a different time)
                   </Text>
                   <SwitchSelector
                     options={[
@@ -1453,7 +1468,7 @@ export class CalendarPlanScreen extends React.Component {
                       marginTop: "20%",
                     }}
                   >
-                    Did you engage yourself in any physical exercise?
+                    Did you engage yourself in any other physical exercise?
                   </Text>
                   <SwitchSelector
                     options={[
@@ -1715,7 +1730,6 @@ export class CalendarPlanScreen extends React.Component {
                     // console.log("================================");
 
                     if (this.state.nextBtnState === "submit") {
-
                       this.resetReport();
 
                       let eventToUpdate = this.eventToday;
@@ -1828,10 +1842,23 @@ export class CalendarPlanScreen extends React.Component {
                         this.setState({ nextBtnState: "submit" });
                       }
                     } else if (this.state.nextBtnState === "next4no") {
-                      this.setState({ isThirdNoStepVis: "none" });
-                      this.setState({ isThirdYesStepVis: "flex" });
-                      this.setState({ btnName: "Submit" });
-                      this.setState({ nextBtnState: "submit" });
+                      if (this.state.otherActivity === "") {
+                        Alert.alert(
+                          "Invalid Name",
+                          "The field can't be empty",
+                          [
+                            {
+                              text: "OK",
+                              onPress: () => console.log("OK Pressed"),
+                            },
+                          ]
+                        );
+                      } else {
+                        this.setState({ isThirdNoStepVis: "none" });
+                        this.setState({ isThirdYesStepVis: "flex" });
+                        this.setState({ btnName: "Submit" });
+                        this.setState({ nextBtnState: "submit" });
+                      }
                     }
                     // else if (this.state.nextBtnState === "next4no") {
                     //   this.setState({ isThirdNoStepVis: "none" });
@@ -1862,23 +1889,38 @@ export class CalendarPlanScreen extends React.Component {
               height: "100%",
               justifyContent: "space-between",
               alignItems: "center",
-              
             }}
           >
-            <View style={{ flex: 0.1,width:"75%",flexDirection: "row",justifyContent:"space-between", alignItems:"center", backgroundColor:"white", borderRadius:20, borderColor:"black", borderWidth:1}}>
-              <View style={{flex:0.6,marginLeft: 10}}>
-                <Text style={{fontWeight:"bold"}}>
-                  You have <Text style={{color:"red"}}>{this.state.preListLength} </Text>uncompleted daily reports
+            <View
+              style={{
+                flex: 0.1,
+                width: "75%",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                backgroundColor: "white",
+                borderRadius: 20,
+                borderColor: "black",
+                borderWidth: 1,
+              }}
+            >
+              <View style={{ flex: 0.6, marginLeft: 10 }}>
+                <Text style={{ fontWeight: "bold" }}>
+                  You have{" "}
+                  <Text style={{ color: "red" }}>
+                    {this.state.preListLength}{" "}
+                  </Text>
+                  uncompleted daily reports
                 </Text>
               </View>
               <TouchableOpacity
                 style={{
                   backgroundColor: "black",
                   color: "white",
-                  flex:0.4,
+                  flex: 0.4,
                   height: 25,
-                  marginRight:5,
-                  marginLeft:5,
+                  marginRight: 5,
+                  marginLeft: 5,
                   borderRadius: 30,
                   justifyContent: "center",
                   alignItems: "center",

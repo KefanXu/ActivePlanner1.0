@@ -48,7 +48,7 @@ export class ReportCollection extends React.Component {
     }
 
     //this.preList.push(dailyReport);
-    for (i = 1; i < 5; i++) {
+    for (let i = 1; i < 5; i++) {
       let preDate = todayDate.setDate(todayDate.getDate() - 1);
       let report = {};
       let date = moment(preDate).format().slice(0, 10);
@@ -302,7 +302,9 @@ export class ReportCollection extends React.Component {
                       marginBottom: "10%",
                     }}
                   >
-                    How satisfied are you with what you've experienced as a result of {this.state.otherActivity} on {this.state.reportDate}?
+                    How satisfied are you with what you've experienced as a
+                    result of {this.state.otherActivity} on{" "}
+                    {this.state.reportDate}?
                   </Text>
                   <SwitchSelector
                     options={[
@@ -502,11 +504,24 @@ export class ReportCollection extends React.Component {
                       this.state.nextBtnState === "next2" ||
                       this.state.nextBtnState === "next3no"
                     ) {
-                      this.setState({ btnName: "Submit" });
-                      this.setState({ nextBtnState: "submit" });
-                      this.setState({ isSecondYesStepVis: "none" });
-                      this.setState({ isThirdYesStepVis: "flex" });
-                      this.setState({ isThirdNoStepVis: "none" });
+                      if (this.state.otherActivity === "") {
+                        Alert.alert(
+                          "Invalid Name",
+                          "The field can't be empty",
+                          [
+                            {
+                              text: "OK",
+                              onPress: () => console.log("OK Pressed"),
+                            },
+                          ]
+                        );
+                      } else {
+                        this.setState({ btnName: "Submit" });
+                        this.setState({ nextBtnState: "submit" });
+                        this.setState({ isSecondYesStepVis: "none" });
+                        this.setState({ isThirdYesStepVis: "flex" });
+                        this.setState({ isThirdNoStepVis: "none" });
+                      }
                     } else if (this.state.nextBtnState === "next2no") {
                       this.setState({ btnName: "next" });
                       this.setState({ nextBtnState: "next3no" });
